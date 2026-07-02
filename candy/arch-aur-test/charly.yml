@@ -1,0 +1,44 @@
+arch-aur-test:
+    candy:
+        version: 2026.144.1443
+        description: |
+            AUR build smoke test — installs yay-bin from the AUR
+            Minimal candy that exercises the Arch AUR build path by installing
+            yay-bin (a prebuilt yay package) from the AUR. Verifiable: the yay
+            binary it provides lands at /usr/bin/yay and reports its version.
+    arch-aur-test-distro:
+        distro:
+            arch:
+                aur:
+                    package:
+                        - yay-bin
+    arch-aur-test-step-0:
+        check: the AUR-installed yay binary is present at /usr/bin/yay
+        plugin: file
+        plugin_input:
+            file: /usr/bin/yay
+            exists: true
+    arch-aur-test-step-1:
+        check: yay runs and reports its version
+        exit_status: 0
+        stdout:
+            - matches: "yay v[0-9]"
+        plugin: command
+        plugin_input:
+            command: /usr/bin/yay --version
+    yay-binary:
+        check: file=/usr/bin/yay
+        id: yay-binary
+        plugin: file
+        plugin_input:
+            file: /usr/bin/yay
+            exists: true
+    yay-version:
+        check: command=/usr/bin/yay --version
+        id: yay-version
+        exit_status: 0
+        stdout:
+            - matches: "yay v[0-9]"
+        plugin: command
+        plugin_input:
+            command: /usr/bin/yay --version

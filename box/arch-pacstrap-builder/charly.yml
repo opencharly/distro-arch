@@ -1,0 +1,11 @@
+arch-pacstrap-builder:
+    candy:
+        base: arch
+        build:
+            - pac
+    arch-pacstrap-builder-distro:
+        distro:
+            - arch
+    arch-pacstrap-builder-candy:
+        candy:
+            - '@github.com/opencharly/charly/candy/pacstrap-builder:v2026.183.1359'

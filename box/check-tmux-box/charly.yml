@@ -1,0 +1,12 @@
+check-tmux-box:
+    candy:
+        base: arch
+        description: >-
+            Disposable bed-support image for the main repo's check-tmux-pod bed — the tmux candy
+            baked on the arch base so the deployed pod container ships /usr/bin/tmux. Not a product
+            box; it backs the R10 witness for the externalized `charly tmux` (candy/plugin-tmux, the
+            first welded-command externalization). Minimal/fast (arch base + tmux only) — the
+            arch analogue of box/arch/box/vscode-test backing check-arch-vscode-pod.
+    check-tmux-box-candy:
+        candy:
+            - '@github.com/opencharly/charly/candy/tmux:v2026.183.1359'

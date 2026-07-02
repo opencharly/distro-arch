@@ -1,0 +1,17 @@
+cuda-arch-builder:
+    candy:
+        base: arch-builder
+        produce:
+            - pixi
+            - npm
+            - cargo
+            - aur
+    cuda-arch-builder-candy:
+        # @github-qualified (like arch-builder's own layers) so this builder
+        # resolves when pulled CROSS-REPO — e.g. box/cachyos's selkies-*-nvidia
+        # images set builder.pixi: arch.cuda-arch-builder, which builds this image as
+        # an intermediate in the consumer's graph; a bare `cuda` would be an
+        # "unknown layer" there (it's an arch-submodule layer, not the consumer's).
+        candy:
+            - '@github.com/opencharly/charly/candy/cuda:v2026.183.1359'
+            - '@github.com/opencharly/charly/candy/nvenc-headers:v2026.183.1359'

@@ -1,0 +1,15 @@
+arch-test:
+    candy:
+        base: arch
+        build:
+            - pac
+            - aur
+        # Explicit builder map: arch-test builds an AUR layer (arch-aur-test); the
+        # aur format routes to the local arch-builder.
+        builder:
+            aur: arch-builder
+    arch-test-candy:
+        candy:
+            - '@github.com/opencharly/charly/candy/agent-forwarding:v2026.183.1359'
+            - arch-pac-test
+            - arch-aur-test
