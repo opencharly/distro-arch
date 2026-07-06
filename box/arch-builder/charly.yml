@@ -6,7 +6,6 @@ arch-builder:
             - npm
             - cargo
             - aur
-    arch-builder-candy:
         candy:
             - '@github.com/opencharly/charly/candy/pixi:v2026.183.1359'
             - '@github.com/opencharly/charly/candy/nodejs:v2026.183.1359'

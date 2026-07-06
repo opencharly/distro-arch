@@ -22,6 +22,5 @@ arch:
             - npm
             - cargo
             - aur
-    arch-distro:
         distro:
             - arch

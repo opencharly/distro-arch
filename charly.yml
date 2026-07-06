@@ -14,7 +14,7 @@
 #  Directly buildable: `charly box build arch-coder` (the build verb defaults to
 #  this charly.yml). From the parent repo: `charly -C box/arch box build
 #  arch-coder`, or anywhere: `charly --repo opencharly/distro-arch box build arch-coder`.
-version: 2026.174.1100
+version: 2026.186.2323
 # Canonical repo identity. Optional now that the main↔arch cycle dissolved (main
 # imports this repo; this repo imports nothing back), but kept for self-import
 # recognition when commands run from inside the submodule.
@@ -53,18 +53,17 @@ check-arch-vscode-pod:
         disposable: true
         lifecycle: dev
         description: Sole proof of the Arch vscode install via the version-pinned, sha256-verified Microsoft direct-download that replaced the broken visual-studio-code-bin AUR package. Builds and deploys the vscode-test pod (arch base + check-keepalive supervisord + vscode), verifies /usr/bin/code and a code --version semver via the baked vscode plan, the supervisord keepalive RUNNING, and that charly status --json shows the running pod (status-shows-pod).
-    status-shows-vscode-pod:
-        check: command=charly status --json
-        id: status-shows-vscode-pod
-        stdout:
-            - contains: '"kind": "pod"'
-            - contains: check-arch-vscode-pod
-        context:
-            - runtime
-        plugin: command
-        plugin_input:
-            command: charly status --json
-            in_container: false
+        plan:
+            - check: command=charly status --json
+              id: status-shows-vscode-pod
+              stdout:
+                - contains: '"kind": "pod"'
+                - contains: check-arch-vscode-pod
+              context:
+                - runtime
+              command:
+                command: charly status --json
+                in_container: false
 # =================================================================
 # check-tmux-pod — R10 witness for the MAIN superproject's externalized `charly tmux`
 # COMMAND (charly candy/plugin-tmux, command:tmux — the FIRST welded-command
@@ -95,164 +94,54 @@ check-tmux-pod:
         disposable: true
         lifecycle: dev
         description: >-
-            Sole proof of the MAIN superproject's externalized `charly tmux` COMMAND
-            (charly candy/plugin-tmux, command:tmux), the FIRST welded-command
-            externalization. A disposable pod running check-tmux-box (arch base + the tmux
-            candy baked) whose host-side check drives the full `charly tmux` session round-trip
-            against the pod via the HOST charly (the baked plugin-tmux under test): `run`
-            creates a detached session, `list` shows it, `capture` returns its echoed output,
-            `send` injects a command the live shell EXECUTES, a second `capture` returns the
-            EXECUTED output, and `kill` tears it down — proving the plugin's `charly cmd`/`charly
-            shell` shell-backs reach the pod's tmux (same container, exec user, and tmux socket)
-            identically to the former welded core path (TMUX-ROUNDTRIP-OK).
-    tmux-roundtrip:
-        check: >-
-            the externalized charly tmux drives a full session round-trip against the pod
-            (run creates a detached session, list shows it, capture returns its echoed RUN
-            marker, send injects a command whose EXECUTED output a second capture returns, kill
-            removes it) — proving the charly cmd/charly shell shell-backs reach the pod's tmux
-        id: tmux-roundtrip
-        exit_status: 0
-        stdout:
-            - contains: TMUX-ROUNDTRIP-OK
-        context:
-            - runtime
-        plugin: command
-        plugin_input:
-            in_container: false
-            command: |
-                set -e
-                charly tmux kill check-tmux-pod -s rdd >/dev/null 2>&1 || true
-                charly tmux run check-tmux-pod -s rdd 'echo TMUX-RUN-LIVE; exec bash --norc'
-                charly tmux list check-tmux-pod | grep -qE '^rdd:'
-                charly tmux capture check-tmux-pod -s rdd -n 200 | grep -q TMUX-RUN-LIVE
-                # send (text + Enter, no -l) injects a command the live shell EXECUTES — the
-                # arithmetic marker $((6*7))→42 only appears in the pane if the keys were
-                # delivered AND the shell ran the line (not merely typed it).
-                charly tmux send check-tmux-pod -s rdd 'echo TMUX-SEND-$((6*7))' --enter
-                charly tmux capture check-tmux-pod -s rdd -n 200 | grep -q 'TMUX-SEND-42'
-                charly tmux kill check-tmux-pod -s rdd
-                echo TMUX-ROUNDTRIP-OK
+            Sole proof of the MAIN superproject's externalized `charly tmux` COMMAND (charly candy/plugin-tmux, command:tmux), the FIRST welded-command externalization. A disposable pod running check-tmux-box (arch base + the tmux candy baked) whose host-side check drives the full `charly tmux` session round-trip against the pod via the HOST charly (the baked plugin-tmux under test): `run` creates a detached session, `list` shows it, `capture` returns its echoed output, `send` injects a command the live shell EXECUTES, a second `capture` returns the EXECUTED output, and `kill` tears it down — proving the plugin's `charly cmd`/`charly shell` shell-backs reach the pod's tmux (same container, exec user, and tmux socket) identically to the former welded core path (TMUX-ROUNDTRIP-OK).
+        plan:
+            - check: >-
+                the externalized charly tmux drives a full session round-trip against the pod (run creates a detached session, list shows it, capture returns its echoed RUN marker, send injects a command whose EXECUTED output a second capture returns, kill removes it) — proving the charly cmd/charly shell shell-backs reach the pod's tmux
+              id: tmux-roundtrip
+              exit_status: 0
+              stdout:
+                - contains: TMUX-ROUNDTRIP-OK
+              context:
+                - runtime
+              command:
+                in_container: false
+                command: |
+                    set -e
+                    charly tmux kill check-tmux-pod -s rdd >/dev/null 2>&1 || true
+                    charly tmux run check-tmux-pod -s rdd 'echo TMUX-RUN-LIVE; exec bash --norc'
+                    charly tmux list check-tmux-pod | grep -qE '^rdd:'
+                    charly tmux capture check-tmux-pod -s rdd -n 200 | grep -q TMUX-RUN-LIVE
+                    # send (text + Enter, no -l) injects a command the live shell EXECUTES — the
+                    # arithmetic marker $((6*7))→42 only appears in the pane if the keys were
+                    # delivered AND the shell ran the line (not merely typed it).
+                    charly tmux send check-tmux-pod -s rdd 'echo TMUX-SEND-$((6*7))' --enter
+                    charly tmux capture check-tmux-pod -s rdd -n 200 | grep -q 'TMUX-SEND-42'
+                    charly tmux kill check-tmux-pod -s rdd
+                    echo TMUX-ROUNDTRIP-OK
 check-arch-pacstrap-vm:
     vm:
         from: arch-pacstrap
         disposable: true
         lifecycle: dev
         description: Sole proof that the from-scratch arch-pacstrap-builder bootstrap path produces a bootable UEFI Arch rootfs VM (distinct from the cachyos-pacstrap path). The privileged arch-pacstrap-builder pacstraps an Arch rootfs (sudo/openssh/qemu-guest-agent/cloud-init/grub/efibootmgr) into a 20G ext4 UEFI q35 disk and creates the libvirt VM, then asserts boot-to-steady-state via a libvirt info domain-state running probe and an SSH boot-witness reading the guest /etc/os-release.
-    pacstrap-libvirt-domain-running:
-        check: libvirt=info
-        id: pacstrap-libvirt-domain-running
-        libvirt: info
-        stdout: {contains: running}
-        context: [runtime]
-    pacstrap-guest-os-release-arch:
-        check: command=cat /etc/os-release
-        id: pacstrap-guest-os-release-arch
-        stdout: {contains: "ID=arch"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "cat /etc/os-release"
+        plan:
+            - check: libvirt=info
+              id: pacstrap-libvirt-domain-running
+              libvirt: info
+              stdout: {contains: running}
+              context: [runtime]
+            - check: command=cat /etc/os-release
+              id: pacstrap-guest-os-release-arch
+              stdout: {contains: "ID=arch"}
+              context: [runtime]
+              command: "cat /etc/os-release"
 check-arch-vm:
     vm:
         from: arch
         disposable: true
         lifecycle: dev
         description: Sole runnable non-GPU bed for deterministic SPICE and the 8-method libvirt-RPC probe surface, and the only bed proving add_candy overlay install and nested local-target host deploys over the external vm deploy (kit.WalkPlans over SSH) and NestedExecutor. Boots the Arch cloud-image libvirt VM (SPICE socket + virtio-gpu + qemu-guest-agent), scps the host charly binary in, overlays ripgrep/uv/pre-commit, runs ~50 guest probes (command/package/service/port/process/user/group/interface/mount/dns/addr plus spice status/screenshot plus the 8 libvirt-RPC probes plus a kernel-param sysctl assertion), and drives two nested local-target beds (tailscale runtime wiring; direnv plus the install-ledger).
-    charly-cachyos-tailscale-test:
-        local:
-            disposable: true
-            lifecycle: dev
-            description: R10 bed for tailscale + tailscale-up runtime wiring
-        charly-cachyos-tailscale-test-add_candy:
-            add_candy:
-                - '@github.com/opencharly/charly/candy/tailscale:v2026.183.1359'
-                - '@github.com/opencharly/charly/candy/tailscale-up:v2026.183.1359'
-        charly-cachyos-tailscale-test-install_opts:
-            install_opts:
-                with_service: true
-                allow_root_tasks: true
-        tt-tailscale-binary:
-            check: command=test -x /usr/bin/tailscale && test -x /usr/sbin/tailscaled
-            id: tt-tailscale-binary
-            context: [runtime]
-            plugin: command
-            plugin_input:
-                command: "test -x /usr/bin/tailscale && test -x /usr/sbin/tailscaled"
-        tt-tailscaled-active:
-            check: command=systemctl is-active tailscaled
-            id: tt-tailscaled-active
-            stdout: {equals: active}
-            context: [runtime]
-            plugin: command
-            plugin_input:
-                command: "systemctl is-active tailscaled"
-        tt-tailscaled-enabled:
-            check: command=systemctl is-enabled tailscaled.service
-            id: tt-tailscaled-enabled
-            stdout: {matches: "^enabled"}
-            context: [runtime]
-            plugin: command
-            plugin_input:
-                command: "systemctl is-enabled tailscaled.service"
-    arch-host:
-        local:
-            disposable: true
-            lifecycle: dev
-        arch-host-add_candy:
-            add_candy:
-                - '@github.com/opencharly/charly/candy/direnv:v2026.183.1359'
-        ah-deploy-recorded:
-            check: command=test -n "$(ls -A ~/.config/opencharly/installed/deploys/ 2>/dev/null)"
-            id: ah-deploy-recorded
-            context: [runtime]
-            plugin: command
-            plugin_input:
-                command: "test -n \"$(ls -A ~/.config/opencharly/installed/deploys/ 2>/dev/null)\""
-        ah-direnv-version:
-            check: command=direnv --version
-            id: ah-direnv-version
-            context: [runtime]
-            plugin: command
-            plugin_input:
-                command: "direnv --version"
-        ah-ledger-deploys-dir:
-            check: command=test -d /home/arch/.config/opencharly/installed/deploys
-            id: ah-ledger-deploys-dir
-            context: [runtime]
-            plugin: command
-            plugin_input:
-                command: "test -d /home/arch/.config/opencharly/installed/deploys"
-        ah-ledger-layers-dir:
-            check: command=test -d /home/arch/.config/opencharly/installed/layers
-            id: ah-ledger-layers-dir
-            context: [runtime]
-            plugin: command
-            plugin_input:
-                command: "test -d /home/arch/.config/opencharly/installed/layers"
-        ah-direnv-installed:
-            check: package=direnv
-            id: ah-direnv-installed
-            context: [runtime]
-            plugin: package
-            plugin_input:
-                package: direnv
-                installed: true
-        ah-no-listeners:
-            check: command=ss -tlnp 2>/dev/null | wc -l
-            id: ah-no-listeners
-            stdout: {matches: "^[0-9]+"}
-            context: [runtime]
-            plugin: command
-            plugin_input:
-                command: "ss -tlnp 2>/dev/null | wc -l"
-        ah-matching-list:
-            check: the matching verb confirms arch-host appears in the rendered list
-            id: ah-matching-list
-            plugin: matching
-            plugin_input: {matching: "arch-host in list", contains: {contains: "arch"}}
-            context: [runtime]
-    check-arch-vm-add_candy:
         # Minimal in-guest tooling so arch-host (child) has something
         # to depend on, and so the command: probes have ripgrep/uv/
         # pre-commit versions to verify. plugin-spice is the out-of-tree
@@ -267,7 +156,6 @@ check-arch-vm:
             - '@github.com/opencharly/charly/candy/uv:v2026.183.1359'
             - '@github.com/opencharly/charly/candy/pre-commit:v2026.183.1359'
             - '@github.com/opencharly/charly/candy/plugin-spice:v2026.183.1359'
-    check-arch-vm-install_opts:
         install_opts:
             with_service: true
             allow_repo_changes: true # pacman-key + mirror tweaks
@@ -283,378 +171,327 @@ check-arch-vm:
             # through cfg.ResolveImage → newest local arch-builder, and builds it
             # on-demand if absent (same path arch-coder's builder: map uses).
             builder_image: arch-builder
-    guest-identity-uid:
-        check: command=id
-        id: guest-identity-uid
-        stdout: {contains: "uid=1000(arch)"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: id
-    guest-identity-wheel:
-        check: command=id
-        id: guest-identity-wheel
-        stdout: {contains: wheel}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: id
-    guest-hostname-nonempty:
-        check: command=cat /etc/hostname
-        id: guest-hostname-nonempty
-        stdout: {matches: ".+"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "cat /etc/hostname"
-    guest-os-release-arch:
-        check: command=cat /etc/os-release
-        id: guest-os-release-arch
-        stdout: {contains: "ID=arch"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "cat /etc/os-release"
-    guest-sudo-nopasswd:
-        check: command=sudo -n whoami
-        id: guest-sudo-nopasswd
-        stdout: {equals: root}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "sudo -n whoami"
-    guest-kernel-release:
-        check: command=uname -r
-        id: guest-kernel-release
-        stdout: {matches: "[0-9]+\\.[0-9]+"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "uname -r"
-    cloud-init-status-done:
-        check: command=cloud-init status --wait --long
-        id: cloud-init-status-done
-        stdout: {contains: "status: done"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "cloud-init status --wait --long"
-    cloud-init-instance-dir:
-        check: command=test -d /var/lib/cloud/instance
-        id: cloud-init-instance-dir
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "test -d /var/lib/cloud/instance"
-    cloud-init-no-errors:
-        check: command=cat /var/lib/cloud/data/result.json
-        id: cloud-init-no-errors
-        stdout: {contains: "\"errors\": []"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "cat /var/lib/cloud/data/result.json"
-    spice-vdagentd-active:
-        check: command=systemctl is-active spice-vdagentd
-        id: spice-vdagentd-active
-        stdout: {equals: active}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "systemctl is-active spice-vdagentd"
-    spice-vdagentd-enabled:
-        check: command=systemctl is-enabled spice-vdagentd
-        id: spice-vdagentd-enabled
-        stdout: {matches: "^(enabled|static)"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "systemctl is-enabled spice-vdagentd"
-    virtio-gpu-module:
-        check: command=lsmod | grep -q virtio_gpu
-        id: virtio-gpu-module
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "lsmod | grep -q virtio_gpu"
-    dri-card0-present:
-        check: command=test -e /dev/dri/card0
-        id: dri-card0-present
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "test -e /dev/dri/card0"
-    spice-status-main:
-        check: spice=status
-        id: spice-status-main
-        spice: status
-        stdout: {contains: display}
-        context: [runtime]
-    spice-framebuffer-nonzero:
-        check: spice=screenshot
-        id: spice-framebuffer-nonzero
-        spice: screenshot
-        artifact: /tmp/check-arch-vm-spice.png
-        artifact_min_bytes: 1024
-        context:
-            - runtime
-    libvirt-domain-running:
-        check: libvirt=info
-        id: libvirt-domain-running
-        libvirt: info
-        stdout: {contains: running}
-        context: [runtime]
-    libvirt-domain-xml-q35:
-        check: libvirt=domain-xml
-        id: libvirt-domain-xml-q35
-        libvirt: "domain-xml"
-        stdout: {contains: q35}
-        context: [runtime]
-    libvirt-domain-xml-virtio:
-        check: libvirt=domain-xml
-        id: libvirt-domain-xml-virtio
-        libvirt: "domain-xml"
-        stdout: {contains: "type='virtio'"}
-        context: [runtime]
-    libvirt-qmp-query-status:
-        check: libvirt=qmp
-        id: libvirt-qmp-query-status
-        libvirt: qmp
-        text: query-status
-        stdout: {contains: running}
-        context: [runtime]
-    libvirt-guest-agent-ping:
-        check: libvirt=guest/ping
-        id: libvirt-guest-agent-ping
-        libvirt: "guest/ping"
-        stderr: {contains: responsive}
-        context: [runtime]
-    libvirt-guest-hostname:
-        check: libvirt=guest/hostname
-        id: libvirt-guest-hostname
-        libvirt: "guest/hostname"
-        stdout: {matches: ".+"}
-        context: [runtime]
-    libvirt-guest-os-info:
-        check: libvirt=guest/os-info
-        id: libvirt-guest-os-info
-        libvirt: "guest/os-info"
-        stdout: {contains: arch}
-        context: [runtime]
-    libvirt-guest-interfaces:
-        check: libvirt=guest/interfaces
-        id: libvirt-guest-interfaces
-        libvirt: "guest/interfaces"
-        stdout: {contains: lo}
-        context: [runtime]
-    pacman-key-populated:
-        check: command=pacman-key --list-keys arch 2>&1 | grep -q pub
-        id: pacman-key-populated
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "pacman-key --list-keys arch 2>&1 | grep -q pub"
-    pacman-repos-reachable:
-        check: command=sudo pacman -Sy --noconfirm
-        id: pacman-repos-reachable
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "sudo pacman -Sy --noconfirm"
-    ssh-authorized-keys:
-        check: command=test -f /home/arch/.ssh/authorized_keys
-        id: ssh-authorized-keys
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "test -f /home/arch/.ssh/authorized_keys"
-    ssh-ed25519-key-count:
-        check: command=grep -c ssh-ed25519 /home/arch/.ssh/authorized_keys
-        id: ssh-ed25519-key-count
-        stdout: {matches: "[1-9]"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "grep -c ssh-ed25519 /home/arch/.ssh/authorized_keys"
-    cpu-count-4:
-        check: command=nproc
-        id: cpu-count-4
-        stdout: {matches: "^4"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: nproc
-    mem-8g-ballpark:
-        check: command=awk '/MemTotal/ {print int($2/1024/1024)}' /proc/meminfo
-        id: mem-8g-ballpark
-        stdout: {matches: "^[78]"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "awk '/MemTotal/ {print int($2/1024/1024)}' /proc/meminfo"
-    disk-ballpark:
-        check: command=df -BG / | awk 'NR==2 {gsub("G","",$2); print int($2)}'
-        id: disk-ballpark
-        stdout: {matches: "^([1-9][0-9]|[1-9][0-9][0-9])"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "df -BG / | awk 'NR==2 {gsub(\"G\",\"\",$2); print int($2)}'"
-    ripgrep-version:
-        check: command=rg --version
-        id: ripgrep-version
-        stdout: {contains: ripgrep}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "rg --version"
-    uv-version:
-        check: command=uv --version
-        id: uv-version
-        stdout: {contains: "uv "}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "uv --version"
-    pre-commit-version:
-        check: command=pre-commit --version
-        id: pre-commit-version
-        stdout: {contains: pre-commit}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "pre-commit --version"
-    tooling-on-path:
-        check: command=command -v rg uv pre-commit
-        id: tooling-on-path
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "command -v rg uv pre-commit"
-    pkg-base-devel-present:
-        check: package=base-devel
-        id: pkg-base-devel-present
-        context: [runtime]
-        plugin: package
-        plugin_input:
-            package: base-devel
-            installed: true
-    pkg-git-present:
-        check: package=git
-        id: pkg-git-present
-        context: [runtime]
-        plugin: package
-        plugin_input:
-            package: git
-            installed: true
-    svc-spice-vdagentd-running:
-        check: service=spice-vdagentd
-        id: svc-spice-vdagentd-running
-        context: [runtime]
-        plugin: service
-        plugin_input:
-            service: spice-vdagentd
-            running: true
-    svc-sshd-running:
-        check: service=sshd
-        id: svc-sshd-running
-        context: [runtime]
-        plugin: service
-        plugin_input:
-            service: sshd
-            running: true
-    port-22-listening:
-        check: port=22
-        id: port-22-listening
-        context: [runtime]
-        plugin: port
-        plugin_input:
-            port: 22
-            listening: true
-    proc-sshd-running:
-        check: process=sshd
-        id: proc-sshd-running
-        context: [runtime]
-        plugin: process
-        plugin_input:
-            process: sshd
-            running: true
-    user-arch-present:
-        check: user=arch
-        id: user-arch-present
-        context: [runtime]
-        plugin: user
-        plugin_input:
-            user: arch
-            uid: 1000
-    group-wheel-present:
-        check: group=wheel
-        id: group-wheel-present
-        context: [runtime]
-        plugin: unix_group
-        plugin_input:
-            unix_group: wheel
-    iface-lo-up:
-        check: interface=lo
-        id: iface-lo-up
-        context: [runtime]
-        plugin: interface
-        plugin_input:
-            interface: lo
-            mtu: 65536
-    mount-root-mounted:
-        check: mount=/
-        id: mount-root-mounted
-        context: [runtime]
-        plugin: mount
-        plugin_input:
-            mount: /
-    kernel-ostype-linux:
-        check: kernel-param=kernel.ostype
-        id: kernel-ostype-linux
-        context: [runtime]
-        plugin: kernel-param
-        plugin_input:
-            kernel-param: kernel.ostype
-            value: Linux
-    dns-arch-org:
-        check: command=getent hosts archlinux.org
-        id: dns-arch-org
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "getent hosts archlinux.org"
-    https-arch-org:
-        check: command=curl -sfo /dev/null -w '%{http_code}' https://archlinux.org/
-        id: https-arch-org
-        stdout: {matches: "^(20[0-9]|30[0-9])"}
-        context: [runtime]
-        plugin: command
-        plugin_input:
-            command: "curl -sfo /dev/null -w '%{http_code}' https://archlinux.org/"
-    dns-check-operator-side:
-        check: dns=archlinux.org
-        id: dns-check-operator-side
-        context: [runtime]
-        plugin: dns
-        plugin_input:
-            dns: archlinux.org
-            resolvable: true
-    addr-ssh-reachable:
-        check: addr=127.0.0.1:2224
-        id: addr-ssh-reachable
-        timeout: "5s"
-        context: [runtime]
-        plugin: addr
-        plugin_input:
-            addr: "127.0.0.1:2224"
-            reachable: true
-    matching-smoke:
-        check: the matching verb smoke-test resolves the arch literal
-        id: matching-smoke
-        plugin: matching
-        plugin_input: {matching: "arch", contains: {equals: "arch"}}
-        context: [runtime]
+        plan:
+            - check: command=id
+              id: guest-identity-uid
+              stdout: {contains: "uid=1000(arch)"}
+              context: [runtime]
+              command: id
+            - check: command=id
+              id: guest-identity-wheel
+              stdout: {contains: wheel}
+              context: [runtime]
+              command: id
+            - check: command=cat /etc/hostname
+              id: guest-hostname-nonempty
+              stdout: {matches: ".+"}
+              context: [runtime]
+              command: "cat /etc/hostname"
+            - check: command=cat /etc/os-release
+              id: guest-os-release-arch
+              stdout: {contains: "ID=arch"}
+              context: [runtime]
+              command: "cat /etc/os-release"
+            - check: command=sudo -n whoami
+              id: guest-sudo-nopasswd
+              stdout: {equals: root}
+              context: [runtime]
+              command: "sudo -n whoami"
+            - check: command=uname -r
+              id: guest-kernel-release
+              stdout: {matches: "[0-9]+\\.[0-9]+"}
+              context: [runtime]
+              command: "uname -r"
+            - check: command=cloud-init status --wait --long
+              id: cloud-init-status-done
+              stdout: {contains: "status: done"}
+              context: [runtime]
+              command: "cloud-init status --wait --long"
+            - check: command=test -d /var/lib/cloud/instance
+              id: cloud-init-instance-dir
+              context: [runtime]
+              command: "test -d /var/lib/cloud/instance"
+            - check: command=cat /var/lib/cloud/data/result.json
+              id: cloud-init-no-errors
+              stdout: {contains: "\"errors\": []"}
+              context: [runtime]
+              command: "cat /var/lib/cloud/data/result.json"
+            - check: command=systemctl is-active spice-vdagentd
+              id: spice-vdagentd-active
+              stdout: {equals: active}
+              context: [runtime]
+              command: "systemctl is-active spice-vdagentd"
+            - check: command=systemctl is-enabled spice-vdagentd
+              id: spice-vdagentd-enabled
+              stdout: {matches: "^(enabled|static)"}
+              context: [runtime]
+              command: "systemctl is-enabled spice-vdagentd"
+            - check: command=lsmod | grep -q virtio_gpu
+              id: virtio-gpu-module
+              context: [runtime]
+              command: "lsmod | grep -q virtio_gpu"
+            - check: command=test -e /dev/dri/card0
+              id: dri-card0-present
+              context: [runtime]
+              command: "test -e /dev/dri/card0"
+            - check: spice=status
+              id: spice-status-main
+              spice: status
+              stdout: {contains: display}
+              context: [runtime]
+            - check: spice=screenshot
+              id: spice-framebuffer-nonzero
+              spice:
+                method: screenshot
+                artifact: /tmp/check-arch-vm-spice.png
+                artifact_min_bytes: 1024
+              context:
+                - runtime
+            - check: libvirt=info
+              id: libvirt-domain-running
+              libvirt: info
+              stdout: {contains: running}
+              context: [runtime]
+            - check: libvirt=domain-xml
+              id: libvirt-domain-xml-q35
+              libvirt: "domain-xml"
+              stdout: {contains: q35}
+              context: [runtime]
+            - check: libvirt=domain-xml
+              id: libvirt-domain-xml-virtio
+              libvirt: "domain-xml"
+              stdout: {contains: "type='virtio'"}
+              context: [runtime]
+            - check: libvirt=qmp
+              id: libvirt-qmp-query-status
+              libvirt:
+                method: qmp
+                text: query-status
+              stdout: {contains: running}
+              context: [runtime]
+            - check: libvirt=guest/ping
+              id: libvirt-guest-agent-ping
+              libvirt: "guest/ping"
+              stderr: {contains: responsive}
+              context: [runtime]
+            - check: libvirt=guest/hostname
+              id: libvirt-guest-hostname
+              libvirt: "guest/hostname"
+              stdout: {matches: ".+"}
+              context: [runtime]
+            - check: libvirt=guest/os-info
+              id: libvirt-guest-os-info
+              libvirt: "guest/os-info"
+              stdout: {contains: arch}
+              context: [runtime]
+            - check: libvirt=guest/interfaces
+              id: libvirt-guest-interfaces
+              libvirt: "guest/interfaces"
+              stdout: {contains: lo}
+              context: [runtime]
+            - check: command=pacman-key --list-keys arch 2>&1 | grep -q pub
+              id: pacman-key-populated
+              context: [runtime]
+              command: "pacman-key --list-keys arch 2>&1 | grep -q pub"
+            - check: command=sudo pacman -Sy --noconfirm
+              id: pacman-repos-reachable
+              context: [runtime]
+              command: "sudo pacman -Sy --noconfirm"
+            - check: command=test -f /home/arch/.ssh/authorized_keys
+              id: ssh-authorized-keys
+              context: [runtime]
+              command: "test -f /home/arch/.ssh/authorized_keys"
+            - check: command=grep -c ssh-ed25519 /home/arch/.ssh/authorized_keys
+              id: ssh-ed25519-key-count
+              stdout: {matches: "[1-9]"}
+              context: [runtime]
+              command: "grep -c ssh-ed25519 /home/arch/.ssh/authorized_keys"
+            - check: command=nproc
+              id: cpu-count-4
+              stdout: {matches: "^4"}
+              context: [runtime]
+              command: nproc
+            - check: command=awk '/MemTotal/ {print int($2/1024/1024)}' /proc/meminfo
+              id: mem-8g-ballpark
+              stdout: {matches: "^[78]"}
+              context: [runtime]
+              command: "awk '/MemTotal/ {print int($2/1024/1024)}' /proc/meminfo"
+            - check: command=df -BG / | awk 'NR==2 {gsub("G","",$2); print int($2)}'
+              id: disk-ballpark
+              stdout: {matches: "^([1-9][0-9]|[1-9][0-9][0-9])"}
+              context: [runtime]
+              command: "df -BG / | awk 'NR==2 {gsub(\"G\",\"\",$2); print int($2)}'"
+            - check: command=rg --version
+              id: ripgrep-version
+              stdout: {contains: ripgrep}
+              context: [runtime]
+              command: "rg --version"
+            - check: command=uv --version
+              id: uv-version
+              stdout: {contains: "uv "}
+              context: [runtime]
+              command: "uv --version"
+            - check: command=pre-commit --version
+              id: pre-commit-version
+              stdout: {contains: pre-commit}
+              context: [runtime]
+              command: "pre-commit --version"
+            - check: command=command -v rg uv pre-commit
+              id: tooling-on-path
+              context: [runtime]
+              command: "command -v rg uv pre-commit"
+            - check: package=base-devel
+              id: pkg-base-devel-present
+              context: [runtime]
+              package:
+                package: base-devel
+                installed: true
+            - check: package=git
+              id: pkg-git-present
+              context: [runtime]
+              package:
+                package: git
+                installed: true
+            - check: service=spice-vdagentd
+              id: svc-spice-vdagentd-running
+              context: [runtime]
+              service:
+                service: spice-vdagentd
+                running: true
+            - check: service=sshd
+              id: svc-sshd-running
+              context: [runtime]
+              service:
+                service: sshd
+                running: true
+            - check: port=22
+              id: port-22-listening
+              context: [runtime]
+              port:
+                port: 22
+                listening: true
+            - check: process=sshd
+              id: proc-sshd-running
+              context: [runtime]
+              process:
+                process: sshd
+                running: true
+            - check: user=arch
+              id: user-arch-present
+              context: [runtime]
+              user:
+                user: arch
+                uid: 1000
+            - check: group=wheel
+              id: group-wheel-present
+              context: [runtime]
+              unix_group: wheel
+            - check: interface=lo
+              id: iface-lo-up
+              context: [runtime]
+              interface:
+                interface: lo
+                mtu: 65536
+            - check: mount=/
+              id: mount-root-mounted
+              context: [runtime]
+              mount: /
+            - check: kernel-param=kernel.ostype
+              id: kernel-ostype-linux
+              context: [runtime]
+              kernel-param:
+                kernel-param: kernel.ostype
+                value: Linux
+            - check: command=getent hosts archlinux.org
+              id: dns-arch-org
+              context: [runtime]
+              command: "getent hosts archlinux.org"
+            - check: command=curl -sfo /dev/null -w '%{http_code}' https://archlinux.org/
+              id: https-arch-org
+              stdout: {matches: "^(20[0-9]|30[0-9])"}
+              context: [runtime]
+              command: "curl -sfo /dev/null -w '%{http_code}' https://archlinux.org/"
+            - check: dns=archlinux.org
+              id: dns-check-operator-side
+              context: [runtime]
+              dns:
+                dns: archlinux.org
+                resolvable: true
+            - check: addr=127.0.0.1:2224
+              id: addr-ssh-reachable
+              timeout: "5s"
+              context: [runtime]
+              addr:
+                addr: "127.0.0.1:2224"
+                reachable: true
+            - check: the matching verb smoke-test resolves the arch literal
+              id: matching-smoke
+              matching: {matching: "arch", contains: {equals: "arch"}}
+              context: [runtime]
+    charly-cachyos-tailscale-test:
+        local:
+            disposable: true
+            lifecycle: dev
+            description: R10 bed for tailscale + tailscale-up runtime wiring
+            add_candy:
+                - '@github.com/opencharly/charly/candy/tailscale:v2026.183.1359'
+                - '@github.com/opencharly/charly/candy/tailscale-up:v2026.183.1359'
+            install_opts:
+                with_service: true
+                allow_root_tasks: true
+            plan:
+                - check: command=test -x /usr/bin/tailscale && test -x /usr/sbin/tailscaled
+                  id: tt-tailscale-binary
+                  context: [runtime]
+                  command: "test -x /usr/bin/tailscale && test -x /usr/sbin/tailscaled"
+                - check: command=systemctl is-active tailscaled
+                  id: tt-tailscaled-active
+                  stdout: {equals: active}
+                  context: [runtime]
+                  command: "systemctl is-active tailscaled"
+                - check: command=systemctl is-enabled tailscaled.service
+                  id: tt-tailscaled-enabled
+                  stdout: {matches: "^enabled"}
+                  context: [runtime]
+                  command: "systemctl is-enabled tailscaled.service"
+    arch-host:
+        local:
+            disposable: true
+            lifecycle: dev
+            add_candy:
+                - '@github.com/opencharly/charly/candy/direnv:v2026.183.1359'
+            plan:
+                - check: command=test -n "$(ls -A ~/.config/opencharly/installed/deploys/ 2>/dev/null)"
+                  id: ah-deploy-recorded
+                  context: [runtime]
+                  command: "test -n \"$(ls -A ~/.config/opencharly/installed/deploys/ 2>/dev/null)\""
+                - check: command=direnv --version
+                  id: ah-direnv-version
+                  context: [runtime]
+                  command: "direnv --version"
+                - check: command=test -d /home/arch/.config/opencharly/installed/deploys
+                  id: ah-ledger-deploys-dir
+                  context: [runtime]
+                  command: "test -d /home/arch/.config/opencharly/installed/deploys"
+                - check: command=test -d /home/arch/.config/opencharly/installed/layers
+                  id: ah-ledger-layers-dir
+                  context: [runtime]
+                  command: "test -d /home/arch/.config/opencharly/installed/layers"
+                - check: package=direnv
+                  id: ah-direnv-installed
+                  context: [runtime]
+                  package:
+                    package: direnv
+                    installed: true
+                - check: command=ss -tlnp 2>/dev/null | wc -l
+                  id: ah-no-listeners
+                  stdout: {matches: "^[0-9]+"}
+                  context: [runtime]
+                  command: "ss -tlnp 2>/dev/null | wc -l"
+                - check: the matching verb confirms arch-host appears in the rendered list
+                  id: ah-matching-list
+                  matching: {matching: "arch-host in list", contains: {contains: "arch"}}
+                  context: [runtime]
 arch-pacstrap:
     vm:
         source:
@@ -682,7 +519,7 @@ arch-pacstrap:
             mode: user
         ssh:
             user: arch
-            port: 12225
+            port_auto: true
             key_source: generate
         cloud_init:
             users:
@@ -782,7 +619,6 @@ arch:
                 # not consume the scp's failure signal anyway because
                 # cloud-init runs before the vm deploy walk fires).
                 strategy: auto
-    arch-libvirt:
         libvirt:
             devices:
                 channels:

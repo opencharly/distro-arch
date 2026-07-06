@@ -13,6 +13,5 @@ arch-pacstrap:
         bootstrap_builder_image: arch-pacstrap-builder
         build:
             - pac
-    arch-pacstrap-distro:
         distro:
             - arch

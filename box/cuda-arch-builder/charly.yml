@@ -6,7 +6,6 @@ cuda-arch-builder:
             - npm
             - cargo
             - aur
-    cuda-arch-builder-candy:
         # @github-qualified (like arch-builder's own layers) so this builder
         # resolves when pulled CROSS-REPO — e.g. box/cachyos's selkies-*-nvidia
         # images set builder.pixi: arch.cuda-arch-builder, which builds this image as
