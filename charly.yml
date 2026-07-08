@@ -494,6 +494,13 @@ check-arch-vm:
                   context: [runtime]
 arch-pacstrap:
     vm:
+        # `backend: libvirt` is REQUIRED — the check-arch-pacstrap-vm bed's
+        # libvirt: probes RPC the daemon for THIS domain; `backend: auto`
+        # silently falls back to qemu under load (daemon busy/slow), creating
+        # the domain outside libvirt and failing every libvirt-RPC probe with
+        # "Domain not found" (the sibling `arch` entity documents the same
+        # failure mode).
+        backend: libvirt
         source:
             kind: bootstrap
             builder: pacstrap
