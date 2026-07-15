@@ -16,4 +16,4 @@ This submodule is the **Arch Linux** base image family: a self-contained
 (R0–R10, hard-cutover, AI attribution, git-workflow). This file only
 signposts and restates no rule. The full multi-agent workflow (sub-agents,
 `/verify-beds`, `/audit-deploy-configs`) is in `/charly-internals:agents`. History
-lives in this repo's `CHANGELOG/` (one file per month).
+lives in this repo's `CHANGELOG/` (one file per CalVer).
