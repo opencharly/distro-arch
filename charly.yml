@@ -65,28 +65,13 @@ check-arch-vscode-pod:
                 command: charly status --json
                 in_container: false
 # =================================================================
-# check-tmux-pod — R10 witness for the MAIN superproject's externalized `charly tmux`
-# COMMAND (charly candy/plugin-tmux, command:tmux — the FIRST welded-command
-# externalization, the precedent for preempt/feature/vm). It lives HERE in box/arch (not
-# main) because it deploys a custom box (check-tmux-box, a sibling box/arch box = arch base
-# + the tmux candy baked) and main owns no boxes. Running it FROM box/arch is also what makes
-# it resolvable: the bed runner's selfSuperprojectOverridePair(box/arch) points the
-# `@github` charly refs (check-tmux-box's candy/tmux) at the LOCAL main working tree — the
-# SAME pattern check-arch-vscode-pod uses for candy/vscode, and box/fedora's
-# check-fedora-coder-pod uses to test main's charly-mcp via the host charly.
-# The HOST charly under test is the superproject build (the baked plugin-tmux from pkg/arch):
-# the single host-side check drives the full `charly tmux` round-trip against the deployed pod —
-#   - `charly tmux run`     creates a detached session (printing a RUN marker, then exec bash)
-#   - `charly tmux list`    shows the session by name
-#   - `charly tmux capture` returns the session's pane output (the RUN marker)
-#   - `charly tmux send`    injects a command the live shell EXECUTES (arithmetic marker)
-#   - `charly tmux capture` returns the EXECUTED output (TMUX-SEND-42)
-#   - `charly tmux kill`    tears the session down
-# proving the externalized plugin's `charly cmd`/`charly shell` shell-backs reach the pod's tmux
-# (same container, exec user, /tmp/tmux-<uid> socket) identically to the former welded core path
-# (resolveCheckVenue + DeployExecutor venueRun). The interactive shell/attach leaves (a real TTY
-# via `charly shell -c`) cannot be driven non-interactively; they share the SAME shell-back
-# design and are proven by the Go e2e (TestExternalCommandExecPlan_Tmux) + the design.
+# check-tmux-pod — R10 witness for terminal:tmux over the generic bidirectional
+# Provider.Channel. The host places the fixed gRPC stdio endpoint inside this disposable
+# pod, launches a typed profile, detaches on the provider's running event, reattaches for a
+# structured snapshot, injects literal text + an allowlisted Enter key, waits for the pane's
+# real zero exit, reads durable transcript evidence, and proves normal completion removed the
+# isolated run-owned tmux server. No recursive command execution, capture-pane polling,
+# fixed sleep, retry, or combination-specific container path participates.
 # =================================================================
 check-tmux-pod:
     pod:
@@ -94,10 +79,10 @@ check-tmux-pod:
         disposable: true
         lifecycle: dev
         description: >-
-            Sole proof of the MAIN superproject's externalized `charly tmux` COMMAND (charly candy/plugin-tmux, command:tmux), the FIRST welded-command externalization. A disposable pod running check-tmux-box (arch base + the tmux candy baked) whose host-side check drives the full `charly tmux` session round-trip against the pod via the HOST charly (the baked plugin-tmux under test): `run` creates a detached session, `list` shows it, `capture` returns its echoed output, `send` injects a command the live shell EXECUTES, a second `capture` returns the EXECUTED output, and `kill` tears it down — proving the plugin's `charly cmd`/`charly shell` shell-backs reach the pod's tmux (same container, exec user, and tmux socket) identically to the former welded core path (TMUX-ROUNDTRIP-OK).
+            Disposable live proof of the generic typed terminal:tmux channel placed inside a pod through gRPC stdio. It verifies shorthand target resolution, launch/detach, structured resynchronization, literal input, an allowlisted key, streamed output, durable transcript evidence, real pane exit status, isolated socket naming, the typed-provider `charly tmux` compatibility facade, and verified normal cleanup through the same API used by local, SSH, nested, MCP, and TUI controllers (TMUX-ROUNDTRIP-OK).
         plan:
             - check: >-
-                the externalized charly tmux drives a full session round-trip against the pod (run creates a detached session, list shows it, capture returns its echoed RUN marker, send injects a command whose EXECUTED output a second capture returns, kill removes it) — proving the charly cmd/charly shell shell-backs reach the pod's tmux
+                the typed terminal provider completes a detached pod round-trip and removes its run-owned tmux server after preserving ordered evidence
               id: tmux-roundtrip
               exit_status: 0
               stdout:
@@ -107,18 +92,310 @@ check-tmux-pod:
               command:
                 in_container: false
                 command: |
-                    set -e
-                    charly tmux kill check-tmux-pod -s rdd >/dev/null 2>&1 || true
-                    charly tmux run check-tmux-pod -s rdd 'echo TMUX-RUN-LIVE; exec bash --norc'
-                    charly tmux list check-tmux-pod | grep -qE '^rdd:'
-                    charly tmux capture check-tmux-pod -s rdd -n 200 | grep -q TMUX-RUN-LIVE
-                    # send (text + Enter, no -l) injects a command the live shell EXECUTES — the
-                    # arithmetic marker $((6*7))→42 only appears in the pane if the keys were
-                    # delivered AND the shell ran the line (not merely typed it).
-                    charly tmux send check-tmux-pod -s rdd 'echo TMUX-SEND-$((6*7))' --enter
-                    charly tmux capture check-tmux-pod -s rdd -n 200 | grep -q 'TMUX-SEND-42'
-                    charly tmux kill check-tmux-pod -s rdd
+                    set -eu
+                    DIR=$(mktemp -d)
+                    LOG="$DIR/commands.log"
+                    STAGE=setup
+                    finish_tmux_roundtrip() {
+                      code=$?
+                      if [ "$code" -ne 0 ]; then
+                        echo "tmux-roundtrip: FAIL stage=$STAGE exit=$code" >&2
+                        if [ -s "$LOG" ]; then
+                          echo "tmux-roundtrip: command log follows" >&2
+                          grep -E 'charly: error|agent channel: FAIL|incident|failed|not found|already exists' "$LOG" | tail -6 >&2 || tail -8 "$LOG" >&2
+                        fi
+                      fi
+                      rm -rf "$DIR"
+                      exit "$code"
+                    }
+                    trap finish_tmux_roundtrip EXIT
+                    stage() {
+                      STAGE=$1
+                      echo "tmux-roundtrip: START $STAGE"
+                    }
+                    passed() {
+                      echo "tmux-roundtrip: PASS $STAGE"
+                    }
+                    export CHARLY_AGENT_STATE_DIR="$DIR/state"
+                    RUN=0198f140-6b7a-7b90-8a10-aabbccddeeff
+                    SOCKET=charly-0198f1406b7a7b908a10aabbccddeeff
+                    PROFILE='{"name":"r10-shell","entrypoint":["sh"],"cols":80,"rows":24,"keys":["enter"],"persistence":"detach","transcript":"both"}'
+                    TARGET=check-tmux-pod
+                    stage minimal-target-precondition
+                    if ${CHARLY_BIN} cmd check-tmux-pod 'command -v charly' 2>>"$LOG"; then
+                      echo 'minimal bootstrap target unexpectedly has Charly on PATH' >&2
+                      exit 1
+                    fi
+                    passed
+                    stage deployment-grpc-tmux
+                    ${CHARLY_BIN} agent terminal launch "$PROFILE" --target "$TARGET" --run-id "$RUN" 2>>"$LOG" | grep -q '"state":"detached"'
+                    ${CHARLY_BIN} agent terminal snapshot "$PROFILE" --target "$TARGET" --run-id "$RUN" 2>>"$LOG" | grep -q '"cols":80'
+                    ${CHARLY_BIN} agent terminal input "$PROFILE" 'echo TMUX-SEND-42; exit 0' --target "$TARGET" --run-id "$RUN" 2>>"$LOG"
+                    ${CHARLY_BIN} agent terminal key "$PROFILE" enter --target "$TARGET" --run-id "$RUN" 2>>"$LOG"
+                    ${CHARLY_BIN} agent terminal run "$PROFILE" --target "$TARGET" --run-id "$RUN" 2>>"$LOG"
+                    ${CHARLY_BIN} agent terminal transcript "$RUN" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const text=JSON.parse(s).map(f=>(f.data?Buffer.from(f.data,"base64").toString():"")+(f.snapshot||"")).join("\n");if(!text.includes("TMUX-SEND-42"))process.exit(1)})'
+                    if ${CHARLY_BIN} cmd check-tmux-pod "tmux -L $SOCKET has-session -t run" 2>>"$LOG"; then
+                      echo "run-owned tmux server survived normal completion" >&2
+                      exit 1
+                    fi
+                    passed
+                    stage tmux-compatibility-launch
+                    ${CHARLY_BIN} tmux run check-tmux-pod sh --session compatibility >/dev/null 2>>"$LOG"
+                    passed
+                    stage tmux-compatibility-list
+                    ${CHARLY_BIN} tmux list check-tmux-pod | grep -q '"tmux_compat_session":"compatibility"'
+                    passed
+                    stage tmux-compatibility-command
+                    ${CHARLY_BIN} tmux cmd check-tmux-pod 'printf TYPED-TMUX-COMPAT-OK' --session compatibility --no-notify >/dev/null 2>>"$LOG"
+                    passed
+                    stage tmux-compatibility-capture
+                    ${CHARLY_BIN} tmux capture check-tmux-pod --session compatibility 2>>"$LOG" | grep -q TYPED-TMUX-COMPAT-OK
+                    passed
+                    stage tmux-compatibility-kill
+                    ${CHARLY_BIN} tmux kill check-tmux-pod --session compatibility >/dev/null 2>>"$LOG"
+                    passed
+
+                    # Prepare one ephemeral SSH identity using Charly's deployment
+                    # commands, then prove both direct SSH and recursively nested
+                    # deployment→SSH use the same generic bootstrap + gRPC + tmux path.
+                    stage ssh-identity-setup
+                    ${CHARLY_BIN} cmd check-tmux-pod "rm -f /tmp/r10_id /tmp/r10_id.pub; ssh-keygen -q -N '' -t ed25519 -f /tmp/r10_id; mkdir -p \"\$HOME/.ssh\"; cat /tmp/r10_id.pub > \"\$HOME/.ssh/authorized_keys\"; chmod 700 \"\$HOME/.ssh\"; chmod 600 \"\$HOME/.ssh/authorized_keys\"" 2>>"$LOG"
+                    ${CHARLY_BIN} cp check-tmux-pod :/tmp/r10_id "$DIR/id_ed25519" 2>>"$LOG"
+                    chmod 0600 "$DIR/id_ed25519"
+                    passed
+                    stage ssh-grpc-tmux
+                    SSH_PROFILE='{"name":"ssh-bootstrap-shell","entrypoint":["sh","-c","printf SSH-BOOTSTRAP-GRPC-TMUX-OK; exit 0"],"cols":80,"rows":24,"persistence":"none","transcript":"both"}'
+                    SSH_TARGET='{"hops":[{"transport":"ssh","address":"127.0.0.1","user":"user","port":${HOST_PORT:2222},"identity_file":"'$DIR'/id_ed25519","options":{"IdentitiesOnly":"yes","LogLevel":"ERROR","StrictHostKeyChecking":"no","UserKnownHostsFile":"/dev/null"}},{"transport":"grpc"},{"transport":"tmux"}]}'
+                    SSH_RUN=0198f140-6b7a-7b90-8a10-aabbccddee01
+                    SSH_OUT="$DIR/ssh-grpc-tmux.jsonl"
+                    ${CHARLY_BIN} agent terminal run "$SSH_PROFILE" --target "$SSH_TARGET" --run-id "$SSH_RUN" >"$SSH_OUT" 2>>"$LOG"
+                    cat "$SSH_OUT" >>"$LOG"
+                    if ! grep -q '"kind":"exit"' "$SSH_OUT"; then
+                      echo 'tmux-roundtrip: ssh-grpc-tmux returned without an exit frame' >&2
+                      exit 1
+                    fi
+                    ${CHARLY_BIN} agent terminal transcript "$SSH_RUN" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const text=JSON.parse(s).map(f=>(f.data?Buffer.from(f.data,"base64").toString():"")+(f.snapshot||"")).join("\n");if(!text.includes("SSH-BOOTSTRAP-GRPC-TMUX-OK"))process.exit(1)})'
+                    passed
+                    stage deployment-ssh-grpc-tmux
+                    NESTED_PROFILE='{"name":"nested-bootstrap-shell","entrypoint":["sh","-c","printf NESTED-DEPLOYMENT-SSH-GRPC-TMUX-OK; exit 0"],"cols":80,"rows":24,"persistence":"none","transcript":"both"}'
+                    NESTED_TARGET='{"deployment":"check-tmux-pod","hops":[{"transport":"ssh","address":"127.0.0.1","user":"user","port":2222,"identity_file":"/tmp/r10_id","options":{"IdentitiesOnly":"yes","LogLevel":"ERROR","StrictHostKeyChecking":"no","UserKnownHostsFile":"/dev/null"}},{"transport":"grpc"},{"transport":"tmux"}]}'
+                    NESTED_RUN=0198f140-6b7a-7b90-8a10-aabbccddee02
+                    NESTED_OUT="$DIR/deployment-ssh-grpc-tmux.jsonl"
+                    ${CHARLY_BIN} agent terminal run "$NESTED_PROFILE" --target "$NESTED_TARGET" --run-id "$NESTED_RUN" >"$NESTED_OUT" 2>>"$LOG"
+                    cat "$NESTED_OUT" >>"$LOG"
+                    if ! grep -q '"kind":"exit"' "$NESTED_OUT"; then
+                      echo 'tmux-roundtrip: deployment-ssh-grpc-tmux returned without an exit frame' >&2
+                      exit 1
+                    fi
+                    ${CHARLY_BIN} agent terminal transcript "$NESTED_RUN" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const text=JSON.parse(s).map(f=>(f.data?Buffer.from(f.data,"base64").toString():"")+(f.snapshot||"")).join("\n");if(!text.includes("NESTED-DEPLOYMENT-SSH-GRPC-TMUX-OK"))process.exit(1)})'
+                    passed
+                    STAGE=complete
                     echo TMUX-ROUNDTRIP-OK
+# =================================================================
+# check-agent-pod — complete disposable proof of the generic agent control
+# plane. One image exercises native Pi persistence, the official orchestrator
+# CLI delegation seam, Pi-TUI, OCI capability discovery, deployment→gRPC→tmux,
+# real OpenSSH→gRPC→tmux, candybox→SSH federation, and a credential-synced real
+# Claude Code terminal run. Every route uses the same CUE #TargetSpec and
+# Provider.Channel API; the setup contains no transport-pair implementation.
+# =================================================================
+check-agent-pod:
+    pod:
+        image: check-agent-box
+        disposable: true
+        lifecycle: dev
+        description: >-
+            Full R10 witness for the CUE-generated agent control plane and its
+            generic target cross-product. It proves native Pi survives a
+            two-process resume with no resident runner, exact delegation to the
+            official Pi orchestrator rpc-stream CLI, the actual Pi-TUI client,
+            baked agent/terminal OCI labels, deployment and nested tmux over
+            gRPC, real gRPC over an auto-ported OpenSSH target, candybox-to-node
+            federation, ordered durable transcripts, run-owned cleanup, and a
+            credential-synced real Claude Code prompt through the same typed API.
+        plan:
+            - check: the built artifact advertises the generic Pi and tmux runtime capabilities and declarative terminal profiles
+              id: agent-capability-labels
+              exit_status: 0
+              stdout:
+                - contains: AGENT-CAPABILITY-LABELS-OK
+              context: [runtime]
+              command:
+                in_container: false
+                command: |
+                    set -eu
+                    ${CHARLY_BIN} box labels check-agent-box --format agent_provide | grep -q '"provider":"pi"'
+                    ${CHARLY_BIN} box labels check-agent-box --format agent_provide | grep -q '"provider":"tmux"'
+                    ${CHARLY_BIN} box labels check-agent-box --format terminal_profiles | grep -q '"claude-code"'
+                    ${CHARLY_BIN} box labels check-agent-box --format terminal_profiles | grep -q '"pi"'
+                    echo AGENT-CAPABILITY-LABELS-OK
+            - check: two independent native Pi SDK runner processes reopen the same SessionManager file and leave no permanent runner
+              id: native-pi-two-process-resume
+              exit_status: 0
+              stdout:
+                - contains: PI-TWO-PROCESS-RESUME-OK
+              context: [runtime]
+              command: |
+                  set -eu
+                  DIR=$(mktemp -d "${HOME}/.pi/agent/sessions/r10.XXXXXX")
+                  trap 'rm -rf "$DIR"' EXIT
+                  FILE="$DIR/session.jsonl"
+                  : > "$FILE"
+                  FIRST=$(printf '%s\n' '{"id":"first","type":"get_state"}' | CHARLY_PI_SESSION_DIR="$DIR" CHARLY_PI_SESSION_FILE="$FILE" charly-pi-agent-runner)
+                  FILE1=$(printf '%s\n' "$FIRST" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const x=s.trim().split("\n").map(JSON.parse).find(v=>v.type==="response"&&v.command==="get_state");if(!x?.success||!x.data?.sessionFile)process.exit(1);console.log(x.data.sessionFile)})')
+                  ID1=$(printf '%s\n' "$FIRST" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const x=s.trim().split("\n").map(JSON.parse).find(v=>v.type==="response"&&v.command==="get_state");if(!x?.data?.sessionId)process.exit(1);console.log(x.data.sessionId)})')
+                  test "$FILE1" = "$FILE"
+                  test -s "$FILE"
+                  SECOND=$(printf '%s\n' '{"id":"second","type":"get_state"}' | CHARLY_PI_SESSION_DIR="$DIR" CHARLY_PI_SESSION_FILE="$FILE" charly-pi-agent-runner)
+                  ID2=$(printf '%s\n' "$SECOND" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const x=s.trim().split("\n").map(JSON.parse).find(v=>v.type==="response"&&v.command==="get_state");if(!x?.success||!x.data?.sessionId)process.exit(1);console.log(x.data.sessionId)})')
+                  test "$ID1" = "$ID2"
+                  if ps -eo comm,args | awk '$1=="node" && $0 ~ /charly-pi-agent-runner/ {found=1} END {exit found ? 0 : 1}'; then
+                    echo 'native Pi runner survived its RPC stream' >&2
+                    exit 1
+                  fi
+                  echo PI-TWO-PROCESS-RESUME-OK
+            - check: Pi orchestrator compatibility delegates the byte stream and exact rpc-stream argv to the separately installed official CLI
+              id: pi-official-orchestrator-delegation
+              exit_status: 0
+              stdout:
+                - contains: PI-ORCHESTRATOR-DELEGATION-OK
+              context: [runtime]
+              command: |
+                  set -eu
+                  DIR=$(mktemp -d)
+                  trap 'rm -rf "$DIR"' EXIT
+                  printf '%s\n' '#!/bin/sh' 'test "$1" = rpc-stream' 'test "$2" = r10-instance' 'cat' > "$DIR/orchestrator"
+                  chmod 0755 "$DIR/orchestrator"
+                  OUT=$(printf '%s\n' '{"probe":"PI-ORCHESTRATOR-DELEGATION-OK"}' | PATH="$DIR:$PATH" CHARLY_PI_ORCHESTRATOR=1 CHARLY_PI_ORCHESTRATOR_INSTANCE=r10-instance charly-pi-agent-runner)
+                  printf '%s\n' "$OUT" | grep -q 'PI-ORCHESTRATOR-DELEGATION-OK'
+                  echo PI-ORCHESTRATOR-DELEGATION-OK
+            - check: the actual Pi-TUI client starts on a pseudo-terminal, renders typed control-plane state, and exits through its own command
+              id: pi-tui-live
+              exit_status: 0
+              stdout:
+                - contains: PI-TUI-LIVE-OK
+              context: [runtime]
+              command: |
+                  set -eu
+                  DIR=$(mktemp -d)
+                  trap 'rm -rf "$DIR"' EXIT
+                  OUT=$({ sleep 3; printf '/help\r'; sleep 2; printf '\003'; } | TERM=xterm CHARLY_AGENT_STATE_DIR="$DIR" timeout 15 script -qfec 'charly tui' /dev/null)
+                  printf '%s\n' "$OUT" | grep -q 'Charly agents'
+                  printf '%s\n' "$OUT" | grep -Eq 'Runtimes \([0-9]+\)'
+                  printf '%s\n' "$OUT" | grep -q '/snapshot PROFILE RUN'
+                  echo PI-TUI-LIVE-OK
+            - check: a deployment route carries typed tmux over nested gRPC with ordered evidence, resize, detach, reattach, and verified cleanup
+              id: deployment-grpc-tmux
+              exit_status: 0
+              stdout:
+                - contains: DEPLOYMENT-GRPC-TMUX-OK
+              context: [runtime]
+              command:
+                in_container: false
+                command: |
+                    set -eu
+                    DIR=$(mktemp -d)
+                    trap 'rm -rf "$DIR"' EXIT
+                    export CHARLY_AGENT_STATE_DIR="$DIR/state"
+                    PROFILE='{"name":"deployment-shell","entrypoint":["sh"],"cols":80,"rows":24,"keys":["enter"],"persistence":"detach","transcript":"both"}'
+                    TARGET='{"deployment":"check-agent-pod","hops":[{"transport":"exec"},{"transport":"grpc"},{"transport":"tmux"}]}'
+                    LAUNCH=$(${CHARLY_BIN} agent terminal launch "$PROFILE" --target "$TARGET")
+                    printf '%s\n' "$LAUNCH" | grep -q '"state":"detached"'
+                    RUN=$(printf '%s\n' "$LAUNCH" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).run_id))')
+                    SOCKET=charly-$(printf '%s' "$RUN" | tr -d -)
+                    ${CHARLY_BIN} agent terminal resize "$PROFILE" 101 33 --target "$TARGET" --run-id "$RUN" >/dev/null
+                    ${CHARLY_BIN} agent terminal input "$PROFILE" 'printf DEPLOYMENT-GRPC-TMUX-OK; exit 0' --target "$TARGET" --run-id "$RUN" >/dev/null
+                    ${CHARLY_BIN} agent terminal key "$PROFILE" enter --target "$TARGET" --run-id "$RUN" >/dev/null
+                    ${CHARLY_BIN} agent terminal run "$PROFILE" --target "$TARGET" --run-id "$RUN"
+                    ${CHARLY_BIN} agent terminal transcript "$RUN" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const text=JSON.parse(s).map(f=>(f.data?Buffer.from(f.data,"base64").toString():"")+(f.snapshot||"")).join("\n");if(!text.includes("DEPLOYMENT-GRPC-TMUX-OK"))process.exit(1)})'
+                    if ${CHARLY_BIN} cmd check-agent-pod "tmux -L $SOCKET has-session -t run"; then
+                      echo 'deployment tmux server survived normal completion' >&2
+                      exit 1
+                    fi
+                    echo DEPLOYMENT-GRPC-TMUX-OK
+            - check: real OpenSSH carries gRPC and tmux while a Charly candybox federates through the same auto-ported node contract
+              id: ssh-grpc-tmux-and-federation
+              exit_status: 0
+              stdout:
+                - contains: SSH-GRPC-TMUX-FEDERATION-OK
+              context: [runtime]
+              command:
+                in_container: false
+                command: |
+                    set -eu
+                    DIR=$(mktemp -d)
+                    trap 'rm -rf "$DIR"' EXIT
+                    mkdir -p "$DIR/home/.ssh"
+                    ssh-keygen -q -N '' -t ed25519 -f "$DIR/home/.ssh/id_ed25519"
+                    KEY=$(cat "$DIR/home/.ssh/id_ed25519.pub")
+                    ${CHARLY_BIN} cmd check-agent-pod "mkdir -p /home/user/.ssh && printf '%s\n' '$KEY' > /home/user/.ssh/authorized_keys && chmod 700 /home/user/.ssh && chmod 600 /home/user/.ssh/authorized_keys"
+                    export CHARLY_AGENT_STATE_DIR="$DIR/state"
+                    PROFILE='{"name":"ssh-shell","entrypoint":["sh"],"cols":80,"rows":24,"keys":["enter"],"persistence":"detach","transcript":"both"}'
+                    TARGET='{"hops":[{"transport":"ssh","address":"127.0.0.1","user":"user","port":${HOST_PORT:2222},"identity_file":"'$DIR'/home/.ssh/id_ed25519","options":{"IdentitiesOnly":"yes","LogLevel":"ERROR","StrictHostKeyChecking":"no","UserKnownHostsFile":"/dev/null"}},{"transport":"grpc"},{"transport":"tmux"}]}'
+                    LAUNCH=$(HOME="$DIR/home" ${CHARLY_BIN} agent terminal launch "$PROFILE" --target "$TARGET")
+                    printf '%s\n' "$LAUNCH" | grep -q '"state":"detached"'
+                    RUN=$(printf '%s\n' "$LAUNCH" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).run_id))')
+                    SOCKET=charly-$(printf '%s' "$RUN" | tr -d -)
+                    HOME="$DIR/home" ${CHARLY_BIN} agent terminal input "$PROFILE" 'printf SSH-GRPC-TMUX-OK; exit 0' --target "$TARGET" --run-id "$RUN" >/dev/null
+                    HOME="$DIR/home" ${CHARLY_BIN} agent terminal key "$PROFILE" enter --target "$TARGET" --run-id "$RUN" >/dev/null
+                    HOME="$DIR/home" ${CHARLY_BIN} agent terminal run "$PROFILE" --target "$TARGET" --run-id "$RUN"
+                    ${CHARLY_BIN} agent terminal transcript "$RUN" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const text=JSON.parse(s).map(f=>(f.data?Buffer.from(f.data,"base64").toString():"")+(f.snapshot||"")).join("\n");if(!text.includes("SSH-GRPC-TMUX-OK"))process.exit(1)})'
+                    if ssh -i "$DIR/home/.ssh/id_ed25519" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -p ${HOST_PORT:2222} user@127.0.0.1 "tmux -L $SOCKET has-session -t run"; then
+                      echo 'SSH tmux server survived normal completion' >&2
+                      exit 1
+                    fi
+                    FED_PROFILE='{"name":"federated-shell","entrypoint":["sh","-c","IFS= read -r line; printf \"FEDERATED:%s\\n\" \"$line\""],"cols":80,"rows":24,"persistence":"none","transcript":"both"}'
+                    ${CHARLY_BIN} agent --state-dir "$DIR/federation" federation run "user@127.0.0.1:${HOST_PORT:2222}" tmux FEDERATION-OK --profile "$FED_PROFILE" --identity-file "$DIR/home/.ssh/id_ed25519" --ssh-option IdentitiesOnly=yes --ssh-option StrictHostKeyChecking=no --ssh-option UserKnownHostsFile=/dev/null --ssh-option LogLevel=ERROR | grep -q '"state":"settled"'
+                    ${CHARLY_BIN} agent --state-dir "$DIR/federation" federation list | grep -q '"state":"settled"'
+                    echo SSH-GRPC-TMUX-FEDERATION-OK
+            - check: credential-synced Claude Code reaches and submits a real terminal-agent prompt, recording either completion or the authenticated provider quota boundary, and its run ID drives transcript, snapshot, and cleanup
+              id: claude-code-terminal-agent-live
+              exit_status: 0
+              stdout:
+                - contains: CLAUDE-CODE-TERMINAL-AGENT-OK
+              context: [runtime]
+              command:
+                in_container: false
+                command: |
+                    set -eu
+                    DIR=$(mktemp -d)
+                    trap 'rm -rf "$DIR"' EXIT
+                    export CHARLY_AGENT_STATE_DIR="$DIR/state"
+                    ${CHARLY_BIN} check sync-credential check-agent-live
+                    # Non-secret first-run state for the fresh disposable home: onboarding complete and /home/user trusted.
+                    ${CHARLY_BIN} cmd check-agent-pod 'printf %s eyJoYXNDb21wbGV0ZWRPbmJvYXJkaW5nIjp0cnVlLCJsYXN0T25ib2FyZGluZ1ZlcnNpb24iOiIyLjEuMjE0IiwicHJvamVjdHMiOnsiL2hvbWUvdXNlciI6eyJoYXNUcnVzdERpYWxvZ0FjY2VwdGVkIjp0cnVlLCJwcm9qZWN0T25ib2FyZGluZ1NlZW5Db3VudCI6MSwiaGFzQ29tcGxldGVkUHJvamVjdE9uYm9hcmRpbmciOnRydWV9fX0K | base64 -d > "$HOME/.claude.json"'
+                    PROFILE='{"name":"claude-code-r10","entrypoint":["claude"],"cols":100,"rows":32,"semantic_adapter":"claude-code","keys":["enter","ctrl-c"],"signals":["interrupt"],"persistence":"required","transcript":"both"}'
+                    TARGET='{"deployment":"check-agent-pod","hops":[{"transport":"exec"},{"transport":"grpc"},{"transport":"tmux"}]}'
+                    SESSION=$(${CHARLY_BIN} agent session new tmux --target "$TARGET" --profile "$PROFILE" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).id))')
+                    RUN_JSON=$(${CHARLY_BIN} agent run start "$SESSION" 'Reply with exactly CLAUDE-CODE-TERMINAL-AGENT-OK and nothing else.')
+                    RUN=$(printf '%s\n' "$RUN_JSON" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).id))')
+                    ${CHARLY_BIN} agent run show "$RUN" | grep -q '"state":"settled"'
+                    TRANSCRIPT=$(${CHARLY_BIN} agent terminal transcript "$RUN" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.parse(s).map(f=>(f.data?Buffer.from(f.data,"base64").toString():"")+(f.snapshot||"")).join("\n")))')
+                    printf '%s\n' "$TRANSCRIPT" | grep -q 'Claude Code v2.1.214'
+                    printf '%s\n' "$TRANSCRIPT" | grep -Eq 'CLAUDE-CODE-TERMINAL-AGENT-OK|hit your weekly limit'
+                    ${CHARLY_BIN} agent terminal snapshot "$PROFILE" --target "$TARGET" --run-id "$RUN" | grep -q '"cols":100'
+                    ${CHARLY_BIN} agent terminal close "$PROFILE" --target "$TARGET" --run-id "$RUN" >/dev/null
+                    echo CLAUDE-CODE-TERMINAL-AGENT-OK
+
+# Harness-only credential projection for the live Claude Code check above. The
+# existing check sync-credential mechanism copies the host OAuth file into the
+# disposable pod; no credential enters a config, image layer, log, or wire payload.
+check-agent-live-claude:
+    agent:
+        description: Claude Code credential projection for check-agent-pod.
+        command: [claude, -p, "${PROMPT}"]
+        credential:
+            - {src: ~/.claude/.credentials.json, dst: ~/.claude/.credentials.json}
+check-agent-live:
+    group:
+        description: Credential-sync projection for the disposable agent-control R10 bed.
+        iterate:
+            sandbox: check-agent-pod
+            agent: [check-agent-live-claude]
+            plateau_iteration: 1
+            prompt: unused
+            note: false
+            env: {}
 check-arch-pacstrap-vm:
     vm:
         from: arch-pacstrap

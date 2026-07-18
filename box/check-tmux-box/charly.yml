@@ -2,6 +2,8 @@ check-tmux-box:
     candy:
         base: arch
         description: >-
-            Disposable bed-support image for the main repo's check-tmux-pod bed — the tmux candy baked on the arch base so the deployed pod container ships /usr/bin/tmux. Not a product box; it backs the R10 witness for the externalized `charly tmux` (candy/plugin-tmux, the first welded-command externalization). Minimal/fast (arch base + tmux only) — the arch analogue of box/arch/box/vscode-test backing check-arch-vscode-pod.
+            Disposable support image for the typed terminal:tmux R10 bed. It intentionally contains tmux and OpenSSH but no Charly package: deployment and SSH transports must probe the venue and replicate the active worktree binary through EnsureCharlyInDeployVenue before starting the gRPC stdio endpoint. This proves direct and recursively nested routes can control an accessible box without requiring Charly to be preinstalled. It is deliberately a test image, not a product image.
         candy:
+            - '@github.com/opencharly/charly/candy/supervisord:v2026.159.1324'
             - '@github.com/opencharly/charly/candy/tmux:v2026.183.1359'
+            - '@github.com/opencharly/charly/candy/sshd:v2026.144.1443'
