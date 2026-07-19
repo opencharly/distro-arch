@@ -9,12 +9,12 @@ check-agent-box:
             plugin, Pi provider, tmux provider, MCP reflection, and generic
             deployment process transport; no permanent agent service is baked.
         candy:
-            - '@github.com/opencharly/charly/candy/charly:v2026.162.1430'
-            - '@github.com/opencharly/charly/candy/plugin-agent:v2026.199.1330'
-            - '@github.com/opencharly/charly/candy/plugin-agent-pi:v2026.199.1330'
-            - '@github.com/opencharly/charly/candy/plugin-tmux:v2026.199.1330'
-            - '@github.com/opencharly/charly/candy/supervisord:v2026.159.1324'
+            - '@github.com/opencharly/charly/candy/charly:v2026.200.1914'
+            - '@github.com/opencharly/charly/candy/plugin-agent:v2026.200.1914'
+            - '@github.com/opencharly/charly/candy/plugin-agent-pi:v2026.200.1914'
+            - '@github.com/opencharly/charly/candy/plugin-tmux:v2026.200.1914'
+            - '@github.com/opencharly/charly/candy/supervisord:v2026.200.1914'
             - '@github.com/opencharly/charly/candy/tmux:v2026.183.1359'
-            - '@github.com/opencharly/charly/candy/sshd:v2026.144.1443'
-            - '@github.com/opencharly/charly/candy/pi-agent:v2026.199.1330'
-            - '@github.com/opencharly/charly/candy/claude-code:v2026.199.1330'
+            - '@github.com/opencharly/charly/candy/sshd:v2026.200.1914'
+            - '@github.com/opencharly/charly/candy/pi-agent:v2026.200.1914'
+            - '@github.com/opencharly/charly/candy/claude-code:v2026.200.1914'

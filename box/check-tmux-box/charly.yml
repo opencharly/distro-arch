@@ -4,6 +4,6 @@ check-tmux-box:
         description: >-
             Disposable support image for the typed terminal:tmux R10 bed. It intentionally contains tmux and OpenSSH but no Charly package: deployment and SSH transports must probe the venue and replicate the active worktree binary through EnsureCharlyInDeployVenue before starting the gRPC stdio endpoint. This proves direct and recursively nested routes can control an accessible box without requiring Charly to be preinstalled. It is deliberately a test image, not a product image.
         candy:
-            - '@github.com/opencharly/charly/candy/supervisord:v2026.159.1324'
+            - '@github.com/opencharly/charly/candy/supervisord:v2026.200.1914'
             - '@github.com/opencharly/charly/candy/tmux:v2026.183.1359'
-            - '@github.com/opencharly/charly/candy/sshd:v2026.144.1443'
+            - '@github.com/opencharly/charly/candy/sshd:v2026.200.1914'
