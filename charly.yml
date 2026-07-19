@@ -375,6 +375,8 @@ check-agent-pod:
                     printf '%s\n' "$TRANSCRIPT" | grep -Eq 'CLAUDE-CODE-TERMINAL-AGENT-OK|hit your weekly limit'
                     ${CHARLY_BIN} agent terminal snapshot "$PROFILE" --target "$TARGET" --run-id "$RUN" | grep -q '"cols":100'
                     ${CHARLY_BIN} agent terminal close "$PROFILE" --target "$TARGET" --run-id "$RUN" >/dev/null
+                    ${CHARLY_BIN} cmd check-agent-pod 'test "$DISABLE_AUTOUPDATER" = 1 && node -e '\''const p=require(process.env.HOME+"/.npm-global/lib/node_modules/@anthropic-ai/claude-code/package.json");if(p.version!=="2.1.214")process.exit(1)'\'' && test -x "$HOME/.npm-global/bin/claude" && "$HOME/.npm-global/bin/claude" --version | grep -q "Claude Code"'
+                    echo CLAUDE-CODE-IMMUTABLE-INSTALL-OK
                     echo CLAUDE-CODE-TERMINAL-AGENT-OK
 
 # Harness-only credential projection for the live Claude Code check above. The
