@@ -9,7 +9,7 @@ arch:
         # FROM resolves to a fixed digest — reproducible builds, no surprise
         # upstream drift, cache-stable downstream. Bump to a newer `base-*` tag
         # when refreshing the Arch base; quay's `base-*` tags are immutable.
-        base: quay.io/archlinux/archlinux:base-20260614.0.544653
+        base: quay.io/archlinux/archlinux:base-20260719.0.558306
         build:
             - pac
         builder:
