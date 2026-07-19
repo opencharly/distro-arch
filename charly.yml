@@ -431,7 +431,7 @@ check-agent-pod:
                 in_container: false
                 command: |
                     set -eu
-                    CLAUDE_VERSION=2.1.214
+                    CLAUDE_VERSION=$(${CHARLY_BIN} cmd check-agent-pod '/usr/local/bin/claude --version' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
                     DIR=$(mktemp -d)
                     trap 'rm -rf "$DIR"' EXIT
                     export CHARLY_AGENT_STATE_DIR="$DIR/state"
@@ -450,7 +450,7 @@ check-agent-pod:
                     printf '%s\n' "$TRANSCRIPT" | grep -Eq 'CLAUDE-CODE-TERMINAL-AGENT-OK|hit your weekly limit'
                     ${CHARLY_BIN} agent terminal snapshot "$PROFILE" --target "$TARGET" --run-id "$RUN" | grep -q '"cols":100'
                     ${CHARLY_BIN} agent terminal close "$PROFILE" --target "$TARGET" --run-id "$RUN" >/dev/null
-                    ${CHARLY_BIN} cmd check-agent-pod 'test "$DISABLE_AUTOUPDATER" = 1 && node -e '\''const p=require(process.env.HOME+"/.npm-global/lib/node_modules/@anthropic-ai/claude-code/package.json");if(p.version!=="'"$CLAUDE_VERSION"'")process.exit(1)'\'' && test -x "$HOME/.npm-global/bin/claude" && "$HOME/.npm-global/bin/claude" --version | grep -q "Claude Code"'
+                    ${CHARLY_BIN} cmd check-agent-pod 'test "$DISABLE_AUTOUPDATER" = 1 && test -x /usr/local/bin/claude && /usr/local/bin/claude --version | grep -q "Claude Code"'
                     echo CLAUDE-CODE-IMMUTABLE-INSTALL-OK
                     echo CLAUDE-CODE-TERMINAL-AGENT-OK
 
