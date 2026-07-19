@@ -289,7 +289,7 @@ check-agent-pod:
                     PROFILE='{"name":"pi-tui-r10","entrypoint":["charly","tui"],"cols":100,"rows":32,"env":{"CHARLY_AGENT_STATE_DIR":"/tmp/charly-r10-pi-tui-tui"},"keys":["enter","ctrl-c"],"persistence":"detach","transcript":"both"}'
                     RUN=0198f140-6b7a-7b90-8a10-aabbccddee10
                     ${CHARLY_BIN} agent terminal launch "$PROFILE" --target check-agent-pod --run-id "$RUN"
-            - check: the Pi-TUI screen renders its title and typed runtime inventory — observable readiness probed by the engine, never a fixed sleep
+            - check: the Pi-TUI screen renders its control-plane section headers — observable readiness probed by the engine, never a fixed sleep
               id: pi-tui-rendered
               exit_status: 0
               eventually: 30s
@@ -303,8 +303,8 @@ check-agent-pod:
                     PROFILE='{"name":"pi-tui-r10","entrypoint":["charly","tui"],"cols":100,"rows":32,"env":{"CHARLY_AGENT_STATE_DIR":"/tmp/charly-r10-pi-tui-tui"},"keys":["enter","ctrl-c"],"persistence":"detach","transcript":"both"}'
                     RUN=0198f140-6b7a-7b90-8a10-aabbccddee10
                     SCREEN=$(${CHARLY_BIN} agent terminal snapshot "$PROFILE" --target check-agent-pod --run-id "$RUN")
-                    printf '%s\n' "$SCREEN" | grep -q 'Charly agents'
-                    printf '%s\n' "$SCREEN" | grep -Eq 'Runtimes \([0-9]+\)'
+                    printf '%s\n' "$SCREEN" | grep -q 'Sessions / targets'
+                    printf '%s\n' "$SCREEN" | grep -q 'Federated nodes'
             - check: the /help command is submitted through terminal API literal input plus the profile-allowlisted Enter key
               id: pi-tui-help-input
               exit_status: 0
@@ -331,7 +331,8 @@ check-agent-pod:
                     export CHARLY_AGENT_STATE_DIR=/tmp/charly-r10-pi-tui
                     PROFILE='{"name":"pi-tui-r10","entrypoint":["charly","tui"],"cols":100,"rows":32,"env":{"CHARLY_AGENT_STATE_DIR":"/tmp/charly-r10-pi-tui-tui"},"keys":["enter","ctrl-c"],"persistence":"detach","transcript":"both"}'
                     RUN=0198f140-6b7a-7b90-8a10-aabbccddee10
-                    ${CHARLY_BIN} agent terminal snapshot "$PROFILE" --target check-agent-pod --run-id "$RUN" | grep -q '/snapshot PROFILE RUN'
+                    ${CHARLY_BIN} agent terminal snapshot "$PROFILE" --target check-agent-pod --run-id "$RUN" | grep -q '/transcript RUN'
+                    ${CHARLY_BIN} agent terminal snapshot "$PROFILE" --target check-agent-pod --run-id "$RUN" | grep -q '/input PROFILE RUN TEXT'
             - check: the Pi-TUI exits through its own allowlisted ctrl-c, the reattached run records the real zero exit, durable transcript evidence carries the session, and normal completion removes the run-owned tmux server
               id: pi-tui-quit-verify
               exit_status: 0
@@ -348,8 +349,8 @@ check-agent-pod:
                     SOCKET=charly-0198f1406b7a7b908a10aabbccddee10
                     ${CHARLY_BIN} agent terminal key "$PROFILE" ctrl-c --target check-agent-pod --run-id "$RUN" >/dev/null
                     ${CHARLY_BIN} agent terminal run "$PROFILE" --target check-agent-pod --run-id "$RUN" | grep -q '"kind":"exit"'
-                    ${CHARLY_BIN} agent terminal transcript "$RUN" | grep -q 'Charly agents'
-                    ${CHARLY_BIN} agent terminal transcript "$RUN" | grep -q '/snapshot PROFILE RUN'
+                    ${CHARLY_BIN} agent terminal transcript "$RUN" | grep -q 'Sessions / targets'
+                    ${CHARLY_BIN} agent terminal transcript "$RUN" | grep -q '/transcript RUN'
                     if ${CHARLY_BIN} cmd check-agent-pod "tmux -L $SOCKET has-session -t run"; then
                       echo 'pi-tui run-owned tmux server survived normal completion' >&2
                       exit 1
