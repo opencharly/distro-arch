@@ -6,4 +6,4 @@ arch-pacstrap-builder:
         distro:
             - arch
         candy:
-            - '@github.com/opencharly/charly/candy/pacstrap-builder:v2026.183.1359'
+            - '@github.com/opencharly/charly/candy/pacstrap-builder:v2026.201.0706'
