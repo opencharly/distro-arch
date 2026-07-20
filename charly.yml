@@ -205,17 +205,7 @@ check-agent-pod:
         disposable: true
         lifecycle: dev
         description: >-
-            Full R10 witness for the CUE-generated agent control plane and its
-            generic target cross-product. It proves native Pi survives a
-            two-process resume with no resident runner, exact delegation to the
-            official Pi orchestrator rpc-stream CLI, the actual Pi-TUI client,
-            baked agent/terminal OCI labels, deployment and nested tmux over
-            gRPC, real gRPC over an auto-ported OpenSSH target, candybox-to-node
-            federation, ordered durable transcripts, run-owned cleanup, and a
-            credential-synced real Claude Code prompt through the same typed API.
-            Host-side plan steps parse JSON session/run output and transcript
-            evidence with `node`, which must be installed on the bed-runner host
-            (in-pod `node` is shipped by the image's own candies).
+            Full R10 witness for the CUE-generated agent control plane and its generic target cross-product. It proves native Pi survives a two-process resume with no resident runner, exact delegation to the official Pi orchestrator rpc-stream CLI, the actual Pi-TUI client, baked agent/terminal OCI labels, deployment and nested tmux over gRPC, real gRPC over an auto-ported OpenSSH target, candybox-to-node federation, ordered durable transcripts, run-owned cleanup, and a credential-synced real Claude Code prompt through the same typed API. Host-side plan steps parse JSON session/run output and transcript evidence with `node`, which must be installed on the bed-runner host (in-pod `node` is shipped by the image's own candies).
         plan:
             - check: the built artifact advertises the generic Pi and tmux runtime capabilities and declarative terminal profiles
               id: agent-capability-labels
@@ -239,24 +229,24 @@ check-agent-pod:
                 - contains: PI-TWO-PROCESS-RESUME-OK
               context: [runtime]
               command: |
-                  set -eu
-                  DIR=$(mktemp -d "${HOME}/.pi/agent/sessions/r10.XXXXXX")
-                  trap 'rm -rf "$DIR"' EXIT
-                  FILE="$DIR/session.jsonl"
-                  : > "$FILE"
-                  FIRST=$(printf '%s\n' '{"id":"first","type":"get_state"}' | CHARLY_PI_SESSION_DIR="$DIR" CHARLY_PI_SESSION_FILE="$FILE" charly-pi-agent-runner)
-                  FILE1=$(printf '%s\n' "$FIRST" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const x=s.trim().split("\n").map(JSON.parse).find(v=>v.type==="response"&&v.command==="get_state");if(!x?.success||!x.data?.sessionFile)process.exit(1);console.log(x.data.sessionFile)})')
-                  ID1=$(printf '%s\n' "$FIRST" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const x=s.trim().split("\n").map(JSON.parse).find(v=>v.type==="response"&&v.command==="get_state");if(!x?.data?.sessionId)process.exit(1);console.log(x.data.sessionId)})')
-                  test "$FILE1" = "$FILE"
-                  test -s "$FILE"
-                  SECOND=$(printf '%s\n' '{"id":"second","type":"get_state"}' | CHARLY_PI_SESSION_DIR="$DIR" CHARLY_PI_SESSION_FILE="$FILE" charly-pi-agent-runner)
-                  ID2=$(printf '%s\n' "$SECOND" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const x=s.trim().split("\n").map(JSON.parse).find(v=>v.type==="response"&&v.command==="get_state");if(!x?.success||!x.data?.sessionId)process.exit(1);console.log(x.data.sessionId)})')
-                  test "$ID1" = "$ID2"
-                  if ps -eo comm,args | awk '$1=="node" && $0 ~ /charly-pi-agent-runner/ {found=1} END {exit found ? 0 : 1}'; then
-                    echo 'native Pi runner survived its RPC stream' >&2
-                    exit 1
-                  fi
-                  echo PI-TWO-PROCESS-RESUME-OK
+                set -eu
+                DIR=$(mktemp -d "${HOME}/.pi/agent/sessions/r10.XXXXXX")
+                trap 'rm -rf "$DIR"' EXIT
+                FILE="$DIR/session.jsonl"
+                : > "$FILE"
+                FIRST=$(printf '%s\n' '{"id":"first","type":"get_state"}' | CHARLY_PI_SESSION_DIR="$DIR" CHARLY_PI_SESSION_FILE="$FILE" charly-pi-agent-runner)
+                FILE1=$(printf '%s\n' "$FIRST" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const x=s.trim().split("\n").map(JSON.parse).find(v=>v.type==="response"&&v.command==="get_state");if(!x?.success||!x.data?.sessionFile)process.exit(1);console.log(x.data.sessionFile)})')
+                ID1=$(printf '%s\n' "$FIRST" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const x=s.trim().split("\n").map(JSON.parse).find(v=>v.type==="response"&&v.command==="get_state");if(!x?.data?.sessionId)process.exit(1);console.log(x.data.sessionId)})')
+                test "$FILE1" = "$FILE"
+                test -s "$FILE"
+                SECOND=$(printf '%s\n' '{"id":"second","type":"get_state"}' | CHARLY_PI_SESSION_DIR="$DIR" CHARLY_PI_SESSION_FILE="$FILE" charly-pi-agent-runner)
+                ID2=$(printf '%s\n' "$SECOND" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const x=s.trim().split("\n").map(JSON.parse).find(v=>v.type==="response"&&v.command==="get_state");if(!x?.success||!x.data?.sessionId)process.exit(1);console.log(x.data.sessionId)})')
+                test "$ID1" = "$ID2"
+                if ps -eo comm,args | awk '$1=="node" && $0 ~ /charly-pi-agent-runner/ {found=1} END {exit found ? 0 : 1}'; then
+                  echo 'native Pi runner survived its RPC stream' >&2
+                  exit 1
+                fi
+                echo PI-TWO-PROCESS-RESUME-OK
             - check: Pi orchestrator compatibility delegates the byte stream and exact rpc-stream argv to the separately installed official CLI
               id: pi-official-orchestrator-delegation
               exit_status: 0
@@ -264,14 +254,14 @@ check-agent-pod:
                 - contains: PI-ORCHESTRATOR-DELEGATION-OK
               context: [runtime]
               command: |
-                  set -eu
-                  DIR=$(mktemp -d)
-                  trap 'rm -rf "$DIR"' EXIT
-                  printf '%s\n' '#!/bin/sh' 'test "$1" = rpc-stream' 'test "$2" = r10-instance' 'cat' > "$DIR/orchestrator"
-                  chmod 0755 "$DIR/orchestrator"
-                  OUT=$(printf '%s\n' '{"probe":"PI-ORCHESTRATOR-DELEGATION-OK"}' | PATH="$DIR:$PATH" CHARLY_PI_ORCHESTRATOR=1 CHARLY_PI_ORCHESTRATOR_INSTANCE=r10-instance charly-pi-agent-runner)
-                  printf '%s\n' "$OUT" | grep -q 'PI-ORCHESTRATOR-DELEGATION-OK'
-                  echo PI-ORCHESTRATOR-DELEGATION-OK
+                set -eu
+                DIR=$(mktemp -d)
+                trap 'rm -rf "$DIR"' EXIT
+                printf '%s\n' '#!/bin/sh' 'test "$1" = rpc-stream' 'test "$2" = r10-instance' 'cat' > "$DIR/orchestrator"
+                chmod 0755 "$DIR/orchestrator"
+                OUT=$(printf '%s\n' '{"probe":"PI-ORCHESTRATOR-DELEGATION-OK"}' | PATH="$DIR:$PATH" CHARLY_PI_ORCHESTRATOR=1 CHARLY_PI_ORCHESTRATOR_INSTANCE=r10-instance charly-pi-agent-runner)
+                printf '%s\n' "$OUT" | grep -q 'PI-ORCHESTRATOR-DELEGATION-OK'
+                echo PI-ORCHESTRATOR-DELEGATION-OK
             - check: the actual Pi-TUI client launches detached inside the pod over the typed terminal:tmux channel
               id: pi-tui-launch
               exit_status: 0
@@ -453,7 +443,6 @@ check-agent-pod:
                     ${CHARLY_BIN} cmd check-agent-pod 'test "$DISABLE_AUTOUPDATER" = 1 && test -x /usr/local/bin/claude && /usr/local/bin/claude --version | grep -q "Claude Code"'
                     echo CLAUDE-CODE-IMMUTABLE-INSTALL-OK
                     echo CLAUDE-CODE-TERMINAL-AGENT-OK
-
 # Harness-only credential projection for the live Claude Code check above. The
 # existing check sync-credential mechanism copies the host OAuth file into the
 # disposable pod; no credential enters a config, image layer, log, or wire payload.
@@ -506,10 +495,10 @@ check-arch-vm:
         # ExtraCandyRefs) — the spice analogue of how plugin-kube/plugin-adb
         # are required by k3s-server/android-emulator-layer.
         add_candy:
-            - '@github.com/opencharly/charly/candy/ripgrep:v2026.183.1359'
-            - '@github.com/opencharly/charly/candy/uv:v2026.183.1359'
-            - '@github.com/opencharly/charly/candy/pre-commit:v2026.183.1359'
-            - '@github.com/opencharly/charly/candy/plugin-spice:v2026.183.1359'
+            - '@github.com/opencharly/charly/candy/ripgrep:v2026.201.0706'
+            - '@github.com/opencharly/charly/candy/uv:v2026.201.0706'
+            - '@github.com/opencharly/charly/candy/pre-commit:v2026.201.0706'
+            - '@github.com/opencharly/charly/candy/plugin-spice:v2026.201.0706'
         install_opts:
             with_service: true
             allow_repo_changes: true # pacman-key + mirror tweaks
@@ -788,8 +777,8 @@ check-arch-vm:
             lifecycle: dev
             description: R10 bed for tailscale + tailscale-up runtime wiring
             add_candy:
-                - '@github.com/opencharly/charly/candy/tailscale:v2026.183.1359'
-                - '@github.com/opencharly/charly/candy/tailscale-up:v2026.183.1359'
+                - '@github.com/opencharly/charly/candy/tailscale:v2026.201.0706'
+                - '@github.com/opencharly/charly/candy/tailscale-up:v2026.201.0706'
             install_opts:
                 with_service: true
                 allow_root_tasks: true
@@ -813,7 +802,7 @@ check-arch-vm:
             disposable: true
             lifecycle: dev
             add_candy:
-                - '@github.com/opencharly/charly/candy/direnv:v2026.183.1359'
+                - '@github.com/opencharly/charly/candy/direnv:v2026.201.0706'
             plan:
                 - check: command=test -n "$(ls -A ~/.config/opencharly/installed/deploys/ 2>/dev/null)"
                   id: ah-deploy-recorded
