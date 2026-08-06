@@ -506,7 +506,7 @@ check-arch-vm:
             verify: true
             # The arch VM is a cloud image (no charly builder context); name the
             # arch-builder image so the npm-building add_candy (pre-commit)
-            # resolves a builder. BundleNode has no `builder:` map field —
+            # resolves a builder. FleetNode has no `builder:` map field —
             # install_opts.builder_image is the supported path (mirrors cachyos).
             # Use the local short-ref (arch-builder), NOT a pinned ghcr tag: a
             # full ghcr ref is checked as-is and breaks when that tag is pruned /
@@ -952,7 +952,7 @@ arch:
                 #
                 # `pacman-key --init && --populate archlinux` is
                 # required for post-boot pacman invocations driven
-                # by `charly bundle add check-arch-vm <ref>` (layer install via
+                # by `charly fleet add check-arch-vm <ref>` (layer install via
                 # SSH). Without it, `pacman -Sy <pkg>` fails with
                 # `keyring is not writable / required key missing`.
                 # Cloud-init's own `packages:` step is unaffected
