@@ -495,10 +495,10 @@ check-arch-vm:
         # ExtraCandyRefs) — the spice analogue of how plugin-kube/plugin-adb
         # are required by k3s-server/android-emulator-layer.
         add_candy:
-            - '@github.com/opencharly/charly/candy/ripgrep:v2026.201.0706'
-            - '@github.com/opencharly/charly/candy/uv:v2026.201.0706'
-            - '@github.com/opencharly/charly/candy/pre-commit:v2026.201.0706'
-            - '@github.com/opencharly/charly/candy/plugin-spice:v2026.201.0706'
+            - '@github.com/opencharly/charly/candy/ripgrep:v2026.231.0530'
+            - '@github.com/opencharly/charly/candy/uv:v2026.231.0530'
+            - '@github.com/opencharly/charly/candy/pre-commit:v2026.231.0530'
+            - '@github.com/opencharly/charly/candy/plugin-spice:v2026.231.0530'
         install_opts:
             with_service: true
             allow_repo_changes: true # pacman-key + mirror tweaks
@@ -777,8 +777,8 @@ check-arch-vm:
             lifecycle: dev
             description: R10 bed for tailscale + tailscale-up runtime wiring
             add_candy:
-                - '@github.com/opencharly/charly/candy/tailscale:v2026.201.0706'
-                - '@github.com/opencharly/charly/candy/tailscale-up:v2026.201.0706'
+                - '@github.com/opencharly/charly/candy/tailscale:v2026.231.0530'
+                - '@github.com/opencharly/charly/candy/tailscale-up:v2026.231.0530'
             install_opts:
                 with_service: true
                 allow_root_tasks: true
@@ -802,7 +802,7 @@ check-arch-vm:
             disposable: true
             lifecycle: dev
             add_candy:
-                - '@github.com/opencharly/charly/candy/direnv:v2026.201.0706'
+                - '@github.com/opencharly/charly/candy/direnv:v2026.231.0530'
             plan:
                 - check: command=test -n "$(ls -A ~/.config/opencharly/installed/deploys/ 2>/dev/null)"
                   id: ah-deploy-recorded
