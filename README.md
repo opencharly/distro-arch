@@ -67,4 +67,4 @@ The author writes only the placeholder CHANGELOG and opens the PR; the engine
 is the sole merge executor.
 
 ---
-*Assisted-by: Claude*
+*Assisted-by: Claude Code deepseek-v4-flash:cloud (analysed on a live system)*
