@@ -49,5 +49,22 @@ access and a `charly` recent enough to understand the config's schema version
 (`charly` hard-fails with an "update charly" message if the config is newer than the
 binary supports).
 
+## Landing & releases
+
+Every change to this repo lands through the **auto-merge engine**
+(`.github/workflows/auto-merge.yml`), never by a direct push to `main`:
+
+1. The fresh `charly/pr-validator` AI review must pass on the PR head.
+2. The engine waits until **every** status check is green, then finalizes the
+   PR's `CHANGELOG/<calver>.md` placeholder to the merge-time CalVer (rename +
+   H1 rewrite + an HTML-comment finalize marker), re-runs the validator on the
+   finalized head via the API, re-verifies all checks green, and merges through
+   GitHub native auto-merge.
+3. The engine mints the release tag on the merged HEAD at the merge-time CalVer
+   (`v<YYYY.DDD.HHMM>`).
+
+The author writes only the placeholder CHANGELOG and opens the PR; the engine
+is the sole merge executor.
+
 ---
 *Assisted-by: Claude*
