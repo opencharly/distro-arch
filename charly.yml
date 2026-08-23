@@ -495,7 +495,7 @@ check-arch-vm:
         # ExtraCandyRefs) — the spice analogue of how plugin-kube/plugin-adb
         # are required by k3s-server/android-emulator-layer.
         add_candy:
-            - '@github.com/opencharly/charly/candy/ripgrep:v2026.231.0530'
+            - '@github.com/opencharly/layer-ripgrep:v2026.235.1653'
             - '@github.com/opencharly/charly/candy/uv:v2026.231.0530'
             - '@github.com/opencharly/charly/candy/pre-commit:v2026.231.0530'
             - '@github.com/opencharly/charly/candy/plugin-spice:v2026.231.0530'
