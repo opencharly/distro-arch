@@ -9,4 +9,4 @@ charly-arch:
             - '@github.com/opencharly/charly/candy/gh:v2026.231.0530'
             - '@github.com/opencharly/charly/candy/sshd:v2026.231.0530'
             - '@github.com/opencharly/charly/candy/container-nesting:v2026.231.0530'
-            - '@github.com/opencharly/charly/candy/nvidia:v2026.231.0530'
+            - '@github.com/opencharly/layer-nvidia:v2026.235.2120'
