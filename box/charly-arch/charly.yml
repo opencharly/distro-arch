@@ -3,7 +3,7 @@ charly-arch:
         base: arch
         candy:
             - '@github.com/opencharly/charly/candy/agent-forwarding:v2026.231.0530'
-            - '@github.com/opencharly/charly/candy/charly:v2026.231.0530'
+            - '@github.com/opencharly/charly/candy/charly:v2026.236.0956'
             - '@github.com/opencharly/charly/candy/charly-mcp:v2026.231.0530'
             - '@github.com/opencharly/layer-golang:v2026.235.2057'
             - '@github.com/opencharly/charly/candy/gh:v2026.231.0530'
