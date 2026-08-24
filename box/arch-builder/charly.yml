@@ -8,6 +8,6 @@ arch-builder:
             - aur
         candy:
             - '@github.com/opencharly/charly/candy/pixi:v2026.231.0530'
-            - '@github.com/opencharly/charly/candy/nodejs:v2026.231.0530'
+            - '@github.com/opencharly/layer-nodejs:v2026.235.2056'
             - '@github.com/opencharly/charly/candy/build-toolchain:v2026.231.0530'
             - '@github.com/opencharly/charly/candy/yay:v2026.231.0530'
