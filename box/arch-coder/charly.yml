@@ -27,7 +27,7 @@ arch-coder:
             - '@github.com/opencharly/layer-uv:v2026.237.458'
             - '@github.com/opencharly/layer-build-toolchain:v2026.237.455'
             - '@github.com/opencharly/layer-dev-tools:v2026.237.502'
-            - '@github.com/opencharly/layer-pre-commit:v2026.237.557'
+            - '@github.com/opencharly/layer-pre-commit:v2026.239.0016'
             - '@github.com/opencharly/layer-direnv:v2026.237.504'
             - '@github.com/opencharly/layer-gh:v2026.237.456'
             - '@github.com/opencharly/layer-typst:v2026.237.458'
