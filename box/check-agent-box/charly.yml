@@ -8,7 +8,7 @@ check-agent-box:
             - '@github.com/opencharly/charly/candy/plugin-agent:v2026.231.0530'
             - '@github.com/opencharly/charly/candy/plugin-agent-pi:v2026.231.0530'
             - '@github.com/opencharly/charly/candy/plugin-tmux:v2026.231.0530'
-            - '@github.com/opencharly/layer-supervisord:v2026.235.2056'
+            - '@github.com/opencharly/layer-supervisord:v2026.239.1300'
             - '@github.com/opencharly/layer-tmux:v2026.235.2057'
             - '@github.com/opencharly/charly/candy/sshd:v2026.231.0530'
             - '@github.com/opencharly/charly/candy/pi-agent:v2026.231.0530'
