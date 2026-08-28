@@ -3,5 +3,5 @@ vscode-test:
         base: arch
         description: Arch vscode install smoke (direct-download path) — backs the check-vscode-pod bed
         candy:
-            - '@github.com/opencharly/charly/candy/check-keepalive:v2026.231.0530'
-            - '@github.com/opencharly/charly/candy/vscode:v2026.231.0530'
+            - '@github.com/opencharly/pod-check-keepalive:v2026.237.456'
+            - '@github.com/opencharly/layer-vscode:v2026.237.458'

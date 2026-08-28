@@ -6,4 +6,4 @@ check-tmux-box:
         candy:
             - '@github.com/opencharly/layer-supervisord:v2026.239.1300'
             - '@github.com/opencharly/layer-tmux:v2026.235.2057'
-            - '@github.com/opencharly/charly/candy/sshd:v2026.231.0530'
+            - '@github.com/opencharly/pod-sshd:v2026.237.558'

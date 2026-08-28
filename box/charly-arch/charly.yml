@@ -2,11 +2,11 @@ charly-arch:
     candy:
         base: arch
         candy:
-            - '@github.com/opencharly/charly/candy/agent-forwarding:v2026.231.0530'
-            - '@github.com/opencharly/charly/candy/charly:v2026.231.0530'
-            - '@github.com/opencharly/charly/candy/charly-mcp:v2026.231.0530'
+            - '@github.com/opencharly/layer-agent-forwarding:v2026.238.1851'
+            - '@github.com/opencharly/charly/candy/charly:v2026.240.0529'
+            - '@github.com/opencharly/charly/candy/charly-mcp:v2026.240.0529'
             - '@github.com/opencharly/layer-golang:v2026.235.2057'
-            - '@github.com/opencharly/charly/candy/gh:v2026.231.0530'
-            - '@github.com/opencharly/charly/candy/sshd:v2026.231.0530'
-            - '@github.com/opencharly/charly/candy/container-nesting:v2026.231.0530'
-            - '@github.com/opencharly/layer-nvidia:v2026.235.2120'
+            - '@github.com/opencharly/layer-gh:v2026.237.456'
+            - '@github.com/opencharly/pod-sshd:v2026.237.558'
+            - '@github.com/opencharly/layer-container-nesting:v2026.237.938'
+            - '@github.com/opencharly/layer-nvidia:v2026.236.116'
