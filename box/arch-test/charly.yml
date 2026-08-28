@@ -9,6 +9,6 @@ arch-test:
         builder:
             aur: arch-builder
         candy:
-            - '@github.com/opencharly/layer-agent-forwarding:v2026.238.1851'
+            - '@github.com/opencharly/layer-agent-forwarding:v2026.239.1607'
             - arch-pac-test
             - arch-aur-test

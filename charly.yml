@@ -496,8 +496,8 @@ check-arch-vm:
         # are required by k3s-server/android-emulator-layer.
         add_candy:
             - '@github.com/opencharly/layer-ripgrep:v2026.235.1653'
-            - '@github.com/opencharly/layer-uv:v2026.237.458'
-            - '@github.com/opencharly/layer-pre-commit:v2026.239.0016'
+            - '@github.com/opencharly/layer-uv:v2026.239.1631'
+            - '@github.com/opencharly/layer-pre-commit:v2026.239.1552'
             - '@github.com/opencharly/plugin-spice/candy/plugin-spice:v2026.237.1428'
         install_opts:
             with_service: true
@@ -777,8 +777,8 @@ check-arch-vm:
             lifecycle: dev
             description: R10 bed for tailscale + tailscale-up runtime wiring
             add_candy:
-                - '@github.com/opencharly/layer-tailscale:v2026.237.458'
-                - '@github.com/opencharly/layer-tailscale-up:v2026.238.2102'
+                - '@github.com/opencharly/layer-tailscale:v2026.240.0121'
+                - '@github.com/opencharly/layer-tailscale-up:v2026.240.0201'
             install_opts:
                 with_service: true
                 allow_root_tasks: true
@@ -802,7 +802,7 @@ check-arch-vm:
             disposable: true
             lifecycle: dev
             add_candy:
-                - '@github.com/opencharly/layer-direnv:v2026.237.504'
+                - '@github.com/opencharly/layer-direnv:v2026.239.1629'
             plan:
                 - check: command=test -n "$(ls -A ~/.config/opencharly/installed/deploys/ 2>/dev/null)"
                   id: ah-deploy-recorded
