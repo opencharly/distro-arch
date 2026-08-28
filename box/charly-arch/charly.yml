@@ -3,8 +3,8 @@ charly-arch:
         base: arch
         candy:
             - '@github.com/opencharly/layer-agent-forwarding:v2026.238.1851'
-            - '@github.com/opencharly/charly/candy/charly:v2026.240.0529'
-            - '@github.com/opencharly/charly/candy/charly-mcp:v2026.240.0529'
+            - '@github.com/opencharly/charly/candy/charly:v2026.240.0759'
+            - '@github.com/opencharly/charly/candy/charly-mcp:v2026.240.0759'
             - '@github.com/opencharly/layer-golang:v2026.235.2057'
             - '@github.com/opencharly/layer-gh:v2026.237.456'
             - '@github.com/opencharly/pod-sshd:v2026.237.558'
