@@ -12,5 +12,5 @@ cuda-arch-builder:
         # an intermediate in the consumer's graph; a bare `cuda` would be an
         # "unknown layer" there (it's an arch-submodule layer, not the consumer's).
         candy:
-            - '@github.com/opencharly/layer-cuda:v2026.235.2121'
-            - '@github.com/opencharly/layer-nvenc-headers:v2026.237.457'
+            - '@github.com/opencharly/layer-cuda:v2026.239.1557'
+            - '@github.com/opencharly/layer-nvenc-headers:v2026.239.1627'
