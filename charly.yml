@@ -6,7 +6,9 @@
 #  the arch-pacstrap-builder + arch-pacstrap bootstrap pair, the arch +
 #  arch-pacstrap VMs, and the disposable check beds) is inlined here or discovered
 #  under box/. This repo VENDORS NOTHING — every candy layer is an
-#  `@github.com/opencharly/charly/candy/...` ref into the main repo. The arch
+#  `@github.com/opencharly/<kind>-<name>:<tag>` ref to that candy's OWN repo (the
+#  candy de-submodule cutover — shared candies no longer live inside the main
+#  repo). The arch
 #  base/builder stack is LOCAL (this submodule owns it after the 2026-06 box
 #  inversion), so NO namespace import is needed — every image's base is a bare
 #  local `arch`, every multi-stage builder a bare local `arch-builder`.
