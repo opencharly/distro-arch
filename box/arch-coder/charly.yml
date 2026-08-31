@@ -17,7 +17,7 @@ arch-coder:
             - '@github.com/opencharly/layer-charly:v2026.243.0408'
             - '@github.com/opencharly/pod-charly-mcp:v2026.243.0516'
             - '@github.com/opencharly/layer-container-nesting:v2026.239.1647'
-            - '@github.com/opencharly/pod-dbus:v2026.239.1555'
+            - '@github.com/opencharly/pod-dbus:v2026.243.1831'
             - '@github.com/opencharly/layer-tmux:v2026.240.0202'
             - '@github.com/opencharly/layer-language-runtimes:v2026.243.0409'
             - '@github.com/opencharly/layer-golang:v2026.239.1614'
