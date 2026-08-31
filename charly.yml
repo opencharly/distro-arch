@@ -500,7 +500,7 @@ check-arch-vm:
             - '@github.com/opencharly/layer-ripgrep:v2026.235.1653'
             - '@github.com/opencharly/layer-uv:v2026.239.1631'
             - '@github.com/opencharly/layer-pre-commit:v2026.243.0409'
-            - '@github.com/opencharly/plugin-spice/candy/plugin-spice:v2026.237.1428'
+            - '@github.com/opencharly/plugin-spice/candy/plugin-spice:v2026.242.0533'
         install_opts:
             with_service: true
             allow_repo_changes: true # pacman-key + mirror tweaks
