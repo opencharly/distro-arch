@@ -16,7 +16,7 @@
 #  Directly buildable: `charly box build arch-coder` (the build verb defaults to
 #  this charly.yml). From the parent repo: `charly -C box/arch box build
 #  arch-coder`, or anywhere: `charly --repo opencharly/distro-arch box build arch-coder`.
-version: 2026.240.1943
+version: 2026.249.2125
 # Canonical repo identity. Optional now that the main↔arch cycle dissolved (main
 # imports this repo; this repo imports nothing back), but kept for self-import
 # recognition when commands run from inside the submodule.
@@ -455,7 +455,15 @@ check-agent-live-claude:
         credential:
             - {src: ~/.claude/.credentials.json, dst: ~/.claude/.credentials.json}
 check-agent-live:
-    group:
+    pod:
+        # Former member-less group: node (supervisor ruling b, Cutover C task 1): the
+        # group carried no members — only the iterate: score over the SEPARATE
+        # check-agent-pod sandbox deploy. Re-authored by hand (the unroll hook refuses
+        # a degenerate group): the image-less pod spelling (agent_provisioned, the
+        # charly-cli iterate-entity pattern) keeps the check-agent-live name
+        # addressable for `charly check sync-credential check-agent-live` while the
+        # sandbox stays the home that exists today.
+        agent_provisioned: true
         description: Credential-sync projection for the disposable agent-control R10 bed.
         iterate:
             sandbox: check-agent-pod
