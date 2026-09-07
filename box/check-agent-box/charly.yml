@@ -3,7 +3,13 @@ check-agent-box:
         base: arch
         description: >-
             Disposable support image for the complete agent-control R10 bed. It contains the pinned native Pi SDK runtime and Pi-TUI, Claude Code, tmux control mode, and an OpenSSH endpoint. The worktree Charly package supplies the CUE-generated provider channel, agent control plugin, Pi provider, tmux provider, MCP reflection, and generic deployment process transport; no permanent agent service is baked.
+        # layer-gh (git + git-lfs + gh) is the harness-sandbox prerequisite: the in-pod
+        # `charly check run-local` (plugin-check) clones the bind-mounted /workspace into
+        # the per-run project clone and resolves the candy @github pins via git ls-remote.
+        # Without git the AI-iterate bed fails inside the sandbox with
+        # "exec: \"git\": executable file not found in $PATH".
         candy:
+            - '@github.com/opencharly/layer-gh:v2026.239.1624'
             - '@github.com/opencharly/layer-charly:v2026.243.0408'
             - '@github.com/opencharly/plugin-agent/candy/plugin-agent:v2026.242.0525'
             - '@github.com/opencharly/plugin-agent-pi/candy/plugin-agent-pi:v2026.242.0525'
