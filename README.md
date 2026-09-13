@@ -17,13 +17,14 @@ of the main repo.
 This submodule OWNS the Arch base/builder stack locally (the `arch` base, the
 `arch-builder` multi-stage builder, and the CUDA-enabled `cuda-arch-builder`),
 so every image's base is a bare local `arch` and **no namespace import is needed**.
-The candy LAYERS are not vendored — each is pulled from the main repo by github
-reference: `@github.com/opencharly/charly/candy/<name>:<tag>` in every box's
+The candy LAYERS are not vendored — each is pulled from its standalone
+`opencharly/<layer-*|pod-*|plugin-*>` repo by github reference:
+`@github.com/opencharly/<layer-*|pod-*|plugin-*>[:subdir]:<tag>` in every box's
 `candy:` list. The two arch-local test candies (`arch-pac-test`, `arch-aur-test`)
 live under `candy/`.
 
-All candy references pin to a single tag of the upstream repo, so a build is
-reproducible. There is exactly one definition of every layer — no duplication.
+All candy references pin to explicit CalVer tags (`v<YYYY.DDD.HHMM>`), so a build
+is reproducible. There is exactly one definition of every layer — no duplication.
 
 ## Build
 
@@ -46,13 +47,14 @@ The first build resolves the upstream github references into
 
 A build of any image here fetches from the upstream repo, so it needs network
 access and a `charly` recent enough to understand the config's schema version
-(`charly` hard-fails with an "update charly" message if the config is newer than the
-binary supports).
+(`charly` hard-fails with a "newer than this charly supports" message if the config
+schema is newer than the binary supports).
 
 ## Landing & releases
 
 Every change to this repo lands through the **auto-merge engine**
-(`.github/workflows/auto-merge.yml`), never by a direct push to `main`:
+(`.github/workflows/pr-validator.yml`, `.github/workflows/tag-on-merge.yml`,
+`.github/scripts/auto-merge-*.sh`), never by a direct push to `main`:
 
 1. The fresh `charly/pr-validator` AI review must pass on the PR head.
 2. The engine waits until **every** status check is green, then finalizes the
