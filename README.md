@@ -17,13 +17,14 @@ of the main repo.
 This submodule OWNS the Arch base/builder stack locally (the `arch` base, the
 `arch-builder` multi-stage builder, and the CUDA-enabled `cuda-arch-builder`),
 so every image's base is a bare local `arch` and **no namespace import is needed**.
-The candy LAYERS are not vendored — each is pulled from the main repo by github
-reference: `@github.com/opencharly/charly/candy/<name>:<tag>` in every box's
+The candy LAYERS are not vendored — each is pulled from its standalone
+`opencharly/<layer-*|pod-*|plugin-*>` repo by github reference:
+`@github.com/opencharly/<layer-*|pod-*|plugin-*>[:subdir]:<tag>` in every box's
 `candy:` list. The two arch-local test candies (`arch-pac-test`, `arch-aur-test`)
 live under `candy/`.
 
-All candy references pin to a single tag of the upstream repo, so a build is
-reproducible. There is exactly one definition of every layer — no duplication.
+All candy references pin to explicit CalVer tags (`v<YYYY.DDD.HHMM>`), so a build
+is reproducible. There is exactly one definition of every layer — no duplication.
 
 ## Build
 
@@ -46,25 +47,24 @@ The first build resolves the upstream github references into
 
 A build of any image here fetches from the upstream repo, so it needs network
 access and a `charly` recent enough to understand the config's schema version
-(`charly` hard-fails with an "update charly" message if the config is newer than the
-binary supports).
+(`charly` hard-fails with a "newer than this charly supports" message if the config
+schema is newer than the binary supports).
 
 ## Landing & releases
 
-Every change to this repo lands through the **auto-merge engine**
-(`.github/workflows/auto-merge.yml`), never by a direct push to `main`:
+Every change to this repo lands through a **pull request**, never by a direct
+push to `main`. Two org-wide workflows drive it:
 
-1. The fresh `charly/pr-validator` AI review must pass on the PR head.
-2. The engine waits until **every** status check is green, then finalizes the
-   PR's `CHANGELOG/<calver>.md` placeholder to the merge-time CalVer (rename +
-   H1 rewrite + an HTML-comment finalize marker), re-runs the validator on the
-   finalized head via the API, re-verifies all checks green, and merges through
-   GitHub native auto-merge.
-3. The engine mints the release tag on the merged HEAD at the merge-time CalVer
-   (`v<YYYY.DDD.HHMM>`).
+1. `.github/workflows/pr-validator.yml` dispatches `charly/pr-validator` on the
+   PR head; on a PASS verdict the validator arms GitHub native auto-merge
+   (squash).
+2. `.github/workflows/tag-on-merge.yml` fires on the validator's completion,
+   waits for the squash merge to land, then mints the release tag on the merged
+   HEAD at the merge-time CalVer (`v<YYYY.DDD.HHMM>`) and writes the
+   `CHANGELOG/<calver>.md` entry from the PR body.
 
-The author writes only the placeholder CHANGELOG and opens the PR; the engine
-is the sole merge executor.
+`.github/scripts/auto-merge-*.sh` hold the de-templated run block and its local
+RDD harness for the org auto-merge engine — scripts, not workflows.
 
 ---
 *Assisted-by: Claude Code deepseek-v4-flash:cloud (analysed on a live system)*
