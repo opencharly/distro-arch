@@ -1421,7 +1421,7 @@ arch-coder-skill:
                 - '@github.com/opencharly/layer-tmux'
             
                 # Language runtimes + managers
-                - language-runtimes           # Go + PHP + .NET 9 + python3-devel
+                - '@github.com/opencharly/layer-language-runtimes:v2026.243.0409'
                 - '@github.com/opencharly/layer-golang'
                 - '@github.com/opencharly/layer-nodejs'  # Arch ships a current Node (v26)
                 - '@github.com/opencharly/layer-rust:v2026.239.1627'
