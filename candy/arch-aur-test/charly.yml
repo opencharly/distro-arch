@@ -1,6 +1,5 @@
 arch-aur-test:
     candy:
-        version: 2026.144.1443
         description: |
             AUR build smoke test — installs yay-bin from the AUR
             Minimal candy that exercises the Arch AUR build path by installing
