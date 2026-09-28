@@ -4,11 +4,6 @@ arch-pacstrap:
         # builder container. bootstrap_builder_image points at the LOCAL
         # arch-pacstrap-builder image above (defined in this repo), so it stays
         # a bare local name — no `charly.` qualifier.
-        # Dedicated version: a layerless bootstrap image on a builder `from:` has
-        # no layer chain to derive ai.opencharly.version from, so it carries its
-        # own CalVer (the entity-version migrate step doesn't cover the bootstrap
-        # `from: builder:` shape).
-        version: 2026.156.2017
         from: builder:pacstrap
         bootstrap_builder_image: arch-pacstrap-builder
         build:
