@@ -13,12 +13,20 @@ arch-coder:
             pixi: arch-builder
         candy:
             # ONE SOURCE per layer (opencharly/charly#739, operator ruling): the composed
-            # meta-layers provide layer-charly (pod-charly-mcp), layer-direnv
-            # (layer-agent-forwarding), and layer-gemini + layer-google-cloud
-            # (layer-google-cloud-npm) — so none of those are re-listed here.
-            # layer-nodejs / layer-rust ARE kept: layer-language-runtimes provides them
-            # only at older tags, so removing the direct refs would DOWNGRADE the box.
-            # The meta-layer's pin must be advanced to the aligned tag first (R5).
+            # meta-layer already provides the other half of each {pod, layer} pair, so
+            # the box keeps exactly ONE ref per candy. The 6 direct refs dropped here and
+            # the composed ref that provides each — all at the SAME tag the box listed,
+            # so the closure is unchanged (no downgrade):
+            #   layer-charly       <- pod-charly-mcp:v2026.243.0516
+            #   layer-nodejs       <- layer-language-runtimes:v2026.243.0409
+            #   layer-rust         <- layer-language-runtimes:v2026.243.0409
+            #   layer-direnv       <- layer-agent-forwarding:v2026.243.0408
+            #   layer-gemini       <- layer-google-cloud-npm:v2026.243.0515
+            #   layer-google-cloud <- layer-google-cloud-npm:v2026.243.0515
+            # MEASURED (charly box inspect arch-coder, before/after): render_candy_order
+            # is byte-identical (53 entries, same order) — layer-nodejs v2026.239.1624 +
+            # layer-rust v2026.239.1627 still land via language-runtimes, so no pin needs
+            # advancing and no meta-layer ref is held back.
             - '@github.com/opencharly/layer-agent-forwarding:v2026.243.0408'
             - '@github.com/opencharly/pod-sshd:v2026.239.1637'
             - '@github.com/opencharly/pod-charly-mcp:v2026.243.0516'
