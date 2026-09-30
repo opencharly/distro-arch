@@ -23,10 +23,10 @@ arch-coder:
             #   layer-direnv       <- layer-agent-forwarding:v2026.243.0408
             #   layer-gemini       <- layer-google-cloud-npm:v2026.243.0515
             #   layer-google-cloud <- layer-google-cloud-npm:v2026.243.0515
-            # MEASURED (charly box inspect arch-coder, before/after): render_candy_order
-            # is byte-identical (53 entries, same order) — layer-nodejs v2026.239.1624 +
-            # layer-rust v2026.239.1627 still land via language-runtimes, so no pin needs
-            # advancing and no meta-layer ref is held back.
+            # MEASURED (charly box inspect arch-coder, origin/main vs head): the resolved
+            # candy set is unchanged (26 entries both sides); each dropped ref is composed
+            # at the SAME tag by the provider listed above (verified over the repo cache),
+            # so the closure is byte-identical and no pin needs advancing.
             - '@github.com/opencharly/layer-agent-forwarding:v2026.243.0408'
             - '@github.com/opencharly/pod-sshd:v2026.239.1637'
             - '@github.com/opencharly/pod-charly-mcp:v2026.243.0516'
