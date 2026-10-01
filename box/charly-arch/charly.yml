@@ -4,7 +4,7 @@ charly-arch:
         candy:
             # ONE SOURCE per layer (opencharly/charly#739, operator ruling): `pod-charly-mcp`
             # provides `layer-charly`, so it is not re-listed here.
-            - '@github.com/opencharly/layer-agent-forwarding:v2026.271.1839'
+            - '@github.com/opencharly/layer-agent-forwarding:v2026.274.0608'
             - '@github.com/opencharly/pod-charly-mcp:v2026.274.0406'
             - '@github.com/opencharly/layer-golang:v2026.272.0137'
             - '@github.com/opencharly/layer-gh:v2026.272.0136'

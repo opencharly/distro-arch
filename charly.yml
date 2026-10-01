@@ -522,7 +522,7 @@ check-arch-vm:
         add_candy:
             - '@github.com/opencharly/layer-ripgrep:v2026.235.1653'
             - '@github.com/opencharly/layer-uv:v2026.272.0409'
-            - '@github.com/opencharly/layer-pre-commit:v2026.272.0509'
+            - '@github.com/opencharly/layer-pre-commit:v2026.274.0641'
             - '@github.com/opencharly/plugin-spice/candy/plugin-spice:v2026.272.0430'
         install_opts:
             with_service: true
@@ -803,7 +803,7 @@ check-arch-vm:
             description: R10 bed for tailscale + tailscale-up runtime wiring
             add_candy:
                 - '@github.com/opencharly/layer-tailscale:v2026.272.0409'
-                - '@github.com/opencharly/layer-tailscale-up:v2026.272.0406'
+                - '@github.com/opencharly/layer-tailscale-up:v2026.274.0624'
             install_opts:
                 with_service: true
                 allow_root_tasks: true
