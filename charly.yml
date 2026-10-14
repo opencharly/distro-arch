@@ -827,24 +827,35 @@ check-arch-vm:
                 disposable: true
                 lifecycle: dev
                 add_candy:
-                    - '@github.com/opencharly/layer-direnv:v2026.272.0057'
+                    # v2026.287.2155 scopes the candy's three build-artifact checks to
+                    # `context: [build]` and adds the deploy-venue assertion — without it the
+                    # per-child `check live` phase runs those build checks in this deploy
+                    # venue and fails (opencharly/layer-direnv#8, filed from this bed).
+                    - '@github.com/opencharly/layer-direnv:v2026.287.2155'
                 plan:
-                    - check: command=test -n "$(ls -A ~/.config/opencharly/installed/deploys/ 2>/dev/null)"
+                    # The install ledger is the `ledger:` section of the per-host charly.yml
+                    # (~/.config/charly/charly.yml) — sdk/kit/install_ledger.go's own header names the
+                    # former ~/.config/opencharly/installed/{deploys,layers} JSON tree DELETED by that
+                    # cutover (sdk#183). These three checks asserted the deleted tree, so they failed on
+                    # every run of this bed; re-pointed to the live shape, measured on the guest:
+                    #   ledger: {deploys: {<id>: {image: check-arch-vm.arch-host, target: local, ...}},
+                    #            candies: {direnv: {deployed_by: [<that id>]}}}
+                    - check: command=grep -q 'check-arch-vm.arch-host' /home/arch/.config/charly/charly.yml
                       id: ah-deploy-recorded
                       context: [runtime]
-                      command: "test -n \"$(ls -A ~/.config/opencharly/installed/deploys/ 2>/dev/null)\""
+                      command: "grep -q 'check-arch-vm.arch-host' /home/arch/.config/charly/charly.yml"
                     - check: command=direnv --version
                       id: ah-direnv-version
                       context: [runtime]
                       command: "direnv --version"
-                    - check: command=test -d /home/arch/.config/opencharly/installed/deploys
-                      id: ah-ledger-deploys-dir
+                    - check: command=grep -q -E '^ +deploys:' /home/arch/.config/charly/charly.yml
+                      id: ah-ledger-deploys-section
                       context: [runtime]
-                      command: "test -d /home/arch/.config/opencharly/installed/deploys"
-                    - check: command=test -d /home/arch/.config/opencharly/installed/layers
-                      id: ah-ledger-layers-dir
+                      command: "grep -q -E '^ +deploys:' /home/arch/.config/charly/charly.yml"
+                    - check: command=grep -q -E '^ +candies:' /home/arch/.config/charly/charly.yml && grep -A3 -E '^ +direnv:' /home/arch/.config/charly/charly.yml | grep -q deployed_by
+                      id: ah-ledger-candies-section
                       context: [runtime]
-                      command: "test -d /home/arch/.config/opencharly/installed/layers"
+                      command: "grep -q -E '^ +candies:' /home/arch/.config/charly/charly.yml && grep -A3 -E '^ +direnv:' /home/arch/.config/charly/charly.yml | grep -q deployed_by"
                     - check: package=direnv
                       id: ah-direnv-installed
                       context: [runtime]
