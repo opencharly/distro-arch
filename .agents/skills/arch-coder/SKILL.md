@@ -28,13 +28,15 @@ Arch Linux counterpart of `/charly-coder:fedora-coder`. Same daily-development s
 
 ## Definition
 
-The list below is the **resolved composition**, not the box's `refs` list: it names **32 candies**, of
-which **26 are the box's direct refs** in `box/arch-coder/charly.yml`. The other six — `charly`,
-`layer-nodejs`, `rust`, `direnv`, `layer-gemini`, `google-cloud` — are still in the closure but now
-arrive **transitively at the same tags** through the composed refs, after the `charly#739` "ONE SOURCE
-per layer" rule dropped those six direct refs (`layer-charly` ← `pod-charly-mcp`, `layer-nodejs` and
-`layer-rust` ← `layer-language-runtimes`, `layer-direnv` ← `layer-agent-forwarding`, `layer-gemini` and
-`layer-google-cloud` ← `layer-google-cloud-npm`). So "26 direct candies" above and the 32 names below
+The list below is the **resolved composition**, not the box's `refs` list: it names **32 candies** by
+their candy names, of which **26 are the box's direct refs** in `box/arch-coder/charly.yml`. The other
+six — `charly`, `layer-nodejs`, `rust`, `direnv`, `layer-gemini`, `google-cloud` — are still in the
+closure but now arrive **transitively at the same tags** through the composed refs, after the `charly#739`
+"ONE SOURCE per layer" rule dropped those six direct refs. That rule's own mapping, in the manifest's
+comment, names the dropped **refs** (which is why the two spellings differ: the list uses candy names,
+the mapping uses ref names): `layer-charly` ← `pod-charly-mcp`, `layer-nodejs` and `layer-rust` ←
+`layer-language-runtimes`, `layer-direnv` ← `layer-agent-forwarding`, `layer-gemini` and
+`layer-google-cloud` ← `layer-google-cloud-npm`. So "26 direct candies" above and the 32 names below
 describe the same box at two depths, and the closure is unchanged.
 
 ```yaml
