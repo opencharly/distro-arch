@@ -61,7 +61,10 @@ config schema is newer than the binary supports).
 ## Layout
 
 - `charly.yml` — the root manifest: the `discover:` tree, the inline VM and
-  check-bed entities, and the embedded `skill:` entities.
+  check-bed entities, and the seven `skill:` routing nodes (`name`/`family`/
+  `owner`, no body — and no `triggers` on these seven).
+- `.agents/skills/<name>/SKILL.md` — the seven skill bodies; the prose lives
+  there, the routing in `charly.yml`.
 - `box/<name>/charly.yml` — one manifest per image / builder / test box.
 - `candy/<name>/charly.yml` — the arch-local test candies.
 - `.github/workflows/tag-on-merge.yml` — CalVer tag + `CHANGELOG/` on merge.
