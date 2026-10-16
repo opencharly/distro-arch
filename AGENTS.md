@@ -9,9 +9,13 @@ into its standalone candy repo; there is **no namespace import** (`import: []`).
 Canonical files:
 
 - `charly.yml` — the root manifest: the `discover:` tree, the inline VM and
-  check-bed entities, and the embedded `skill:` entities (`arch`,
+  check-bed entities, and the seven `skill:` routing nodes (`arch`,
   `arch-builder`, `arch-test`, `arch-pac-test`, `arch-aur-test`, `arch-coder`,
-  `charly-arch`).
+  `charly-arch`), each carrying `name`/`family`/`owner` and no body — and, for
+  these seven, no `triggers` either (measured; the corpus's generated
+  `DISPATCHER.md` carries no row for them, consistently).
+- `.agents/skills/<name>/SKILL.md` — the seven skill BODIES, one directory per
+  node's `name:`. The files are the source of record for the prose.
 - `box/<name>/charly.yml` — one manifest per image / builder / test box.
 - `candy/<name>/charly.yml` — the arch-local test candies.
 - `.github/workflows/tag-on-merge.yml` — CalVer tag + `CHANGELOG/` on merge.
@@ -43,9 +47,10 @@ Canonical files:
 
 ## Modify this repo
 
-- Edit the box manifest under `box/<name>/charly.yml` and any embedded `skill:`
-  entity in `charly.yml` together — the skill is the projected usage source, so
-  a change not mirrored in the skill leaves the corpus stale.
+- Edit a skill's `SKILL.md` under `.agents/skills/<name>/` for the prose, or its
+  node in `charly.yml` for the routing — never the generated `SKILL.md` in the
+  marketplace corpus; a corpus regeneration (`charly marketplace generate`)
+  projects both.
 - Package and behaviour changes go in the matching `distro:` arm and the box's
   `candy:` list; the `@github` refs pin to explicit CalVer tags.
 - New behaviour claims belong in a `plan:` as an observable `check:` step, and
