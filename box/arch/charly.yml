@@ -23,3 +23,8 @@ arch:
             - aur
         distro:
             - arch
+        # The skill-prose bundle: a `skill:` node's owner must be a candy, not an image
+        # (opencharly/sdk#434), so the five Arch skill nodes are owned by `arch-skills` and it
+        # rides every image that carries one of them.
+        candy:
+            - arch-skills

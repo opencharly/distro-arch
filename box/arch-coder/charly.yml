@@ -53,6 +53,7 @@ arch-coder:
             - '@github.com/opencharly/layer-github-actions:v2026.272.0135'
             - '@github.com/opencharly/layer-google-cloud-npm:v2026.273.1835'
             - '@github.com/opencharly/layer-grafana-tools:v2026.272.0139'
+            - arch-skills
         # No box-level check: every CLI / language / devops binary, the sshd +
         # charly-mcp ports, AND `charly version` belong to their providing candy's
         # baked check (claude-code/codex/gemini/forgecode, golang/nodejs/rust,

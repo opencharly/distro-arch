@@ -61,12 +61,15 @@ config schema is newer than the binary supports).
 ## Layout
 
 - `charly.yml` — the root manifest: the `discover:` tree, the inline VM and
-  check-bed entities, and the seven `skill:` routing nodes (`name`/`family`/
-  `owner`, no body — and no `triggers` on these seven).
-- `.agents/skills/<name>/SKILL.md` — the seven skill bodies; the prose lives
-  there, the routing in `charly.yml`.
+  check-bed entities, and the two `skill:` routing nodes this repo's test candies
+  own (`name`/`family`/`owner`, no body — and no `triggers` on these).
+- `candy/arch-skills/charly.yml` — the `arch-skills` bundle candy: the five
+  `skill:` nodes an IMAGE may not own (opencharly/sdk#434), composed into every
+  image that carries one of those skills.
+- `<owning candy>/.agents/skills/<name>/SKILL.md` — the seven skill bodies; the
+  prose lives beside the owning candy, the routing in that candy's `charly.yml`.
 - `box/<name>/charly.yml` — one manifest per image / builder / test box.
-- `candy/<name>/charly.yml` — the arch-local test candies.
+- `candy/<name>/charly.yml` — the arch-local test candies and the skill bundle.
 - `.github/workflows/tag-on-merge.yml` — CalVer tag + `CHANGELOG/` on merge.
 - `README.md` — this user overview.
 
