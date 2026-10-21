@@ -1024,15 +1024,6 @@ arch-aur-test-skill:
         description: |-
             Test candy for AUR package installation on Arch Linux.
             Use when working with the arch-aur-test candy.
-arch-builder-skill:
-    skill:
-        name: arch-builder
-        family: distros
-        owner: arch-builder
-        description: |-
-            Arch Linux builder image with pixi, Node.js, build toolchain, and yay AUR helper.
-            Default builder for pixi, npm, cargo, and aur multi-stage builds on Arch.
-            MUST be invoked before building, deploying, configuring, or troubleshooting the arch-builder box.
 arch-pac-test-skill:
     skill:
         name: arch-pac-test
@@ -1041,44 +1032,3 @@ arch-pac-test-skill:
         description: |-
             Test candy for pacman package installation on Arch Linux.
             Use when working with the arch-pac-test candy.
-arch-test-skill:
-    skill:
-        name: arch-test
-        family: distros
-        owner: arch-test
-        description: |-
-            Test box for Arch Linux pacman and AUR package installation.
-            MUST be invoked before building or troubleshooting the arch-test box.
-arch-skill:
-    skill:
-        name: arch
-        family: distros
-        owner: arch
-        description: |-
-            Base Arch Linux image. Root of the box hierarchy for all pac-based boxes.
-            MUST be invoked before building, deploying, configuring, or troubleshooting the arch box.
-arch-coder-skill:
-    skill:
-        name: arch-coder
-        family: coder
-        owner: arch-coder
-        description: |-
-            Kitchen-sink development box on Arch Linux: coding + AI-coding CLIs +
-            DevOps tooling in one container. Arch base, 26 direct candies mirroring
-            fedora-coder's stack but with pac:-section packages (plus AUR for a few
-            unique cases). Runs as uid 1000 (`user`) with passwordless sudo.
-            Use when working with the arch-coder box — or when comparing
-            cross-distro parity across the four coder-family boxes (fedora,
-            debian, ubuntu, arch).
-charly-arch-skill:
-    skill:
-        name: charly-arch
-        family: coder
-        owner: charly-arch
-        description: |-
-            Arch Linux box with the full charly toolchain. Rootless-first — runs as
-            uid=1000 with passwordless sudo (no root, no cap_add: ALL).
-            Composes /charly-coder:charly-mcp so the box is reachable as an MCP gateway
-            on port 18765. NVIDIA GPU runtime composed in.
-            MUST be invoked before building, deploying, configuring, or troubleshooting
-            the charly-arch box.
