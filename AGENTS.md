@@ -21,12 +21,13 @@ Canonical files:
   skill's prose can never be read and the node never reaches the
   `ai.opencharly.skill` label (opencharly/sdk#434). The candy is composed into
   every image that carries one of those skills.
-- `<owning candy>/.agents/skills/<name>/SKILL.md` — the seven skill BODIES, one
-  directory per node's `name:`, BESIDE the candy that owns the node
-  (`candy/arch-skills/` for five, `candy/arch-pac-test/` and
-  `candy/arch-aur-test/` for the other two — the reader is
-  `<candy source dir>/.agents/skills/<name>/SKILL.md`, never the repo root). The
-  files are the source of record for the prose.
+- `.agents/skills/<name>/SKILL.md` — the seven skill BODIES, one directory per
+  node's `name:`, at THIS REPO'S ROOT. The reader — in `deploykit` and in the
+  marketplace corpus alike — resolves `<repo root>/.agents/skills/<name>/`, so
+  the tree is the one canonical base and there is no copy beside the owning
+  candy (opencharly/opencharly#557; it supersedes the candy-dir base that
+  opencharly/sdk#434's re-home used). The files are the source of record for
+  the prose.
 - `box/<name>/charly.yml` — one manifest per image / builder / test box.
 - `candy/<name>/charly.yml` — the arch-local test candies and the skill bundle.
 - `.github/workflows/tag-on-merge.yml` — CalVer tag + `CHANGELOG/` on merge.
@@ -58,10 +59,12 @@ Canonical files:
 
 ## Modify this repo
 
-- Edit a skill's body under its OWNING candy's `.agents/skills/<name>/` and its
-  routing node in that same candy's `charly.yml` together — never the generated
+- Edit a skill's body under `.agents/skills/<name>/` at the REPO ROOT and its
+  routing node in the owning candy's `charly.yml` together — never the generated
   `SKILL.md` in the marketplace corpus; a corpus regeneration
-  (`charly marketplace generate`) projects both.
+  (`charly marketplace generate`) projects both. Moving a body back beside a
+  candy re-creates the two-base defect: `charly box validate` and the corpus
+  would then read different trees.
 - Package and behaviour changes go in the matching `distro:` arm and the box's
   `candy:` list; the `@github` refs pin to explicit CalVer tags.
 - New behaviour claims belong in a `plan:` as an observable `check:` step, and
