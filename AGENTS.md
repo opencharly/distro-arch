@@ -9,11 +9,27 @@ into its standalone candy repo; there is **no namespace import** (`import: []`).
 Canonical files:
 
 - `charly.yml` — the root manifest: the `discover:` tree, the inline VM and
-  check-bed entities, and the embedded `skill:` entities (`arch`,
-  `arch-builder`, `arch-test`, `arch-pac-test`, `arch-aur-test`, `arch-coder`,
-  `charly-arch`).
+  check-bed entities, and the two `skill:` routing nodes this repo's own test
+  candies own (`arch-pac-test`, `arch-aur-test`), each carrying
+  `name`/`family`/`owner` and no body — and no `triggers` either (measured; the
+  corpus's generated `DISPATCHER.md` carries no row for them, consistently).
+- `candy/arch-skills/charly.yml` — the `arch-skills` bundle candy PLUS the five
+  `skill:` routing nodes whose only other owner was an image (`arch`,
+  `arch-builder`, `arch-test`, `arch-coder`, `charly-arch`), each with
+  `owner: arch-skills`. A skill's `owner:` must be a CANDY: an image is a
+  `candy:` node carrying `base:`/`from:`, so it has no source directory, its
+  skill's prose can never be read and the node never reaches the
+  `ai.opencharly.skill` label (opencharly/sdk#434). The candy is composed into
+  every image that carries one of those skills.
+- `.agents/skills/<name>/SKILL.md` — the seven skill BODIES, one directory per
+  node's `name:`, at THIS REPO'S ROOT. The reader — in `deploykit` and in the
+  marketplace corpus alike — resolves `<repo root>/.agents/skills/<name>/`, so
+  the tree is the one canonical base and there is no copy beside the owning
+  candy (opencharly/opencharly#557; it supersedes the candy-dir base that
+  opencharly/sdk#434's re-home used). The files are the source of record for
+  the prose.
 - `box/<name>/charly.yml` — one manifest per image / builder / test box.
-- `candy/<name>/charly.yml` — the arch-local test candies.
+- `candy/<name>/charly.yml` — the arch-local test candies and the skill bundle.
 - `.github/workflows/tag-on-merge.yml` — CalVer tag + `CHANGELOG/` on merge.
 - `README.md` — user overview only; never agent guidance.
 
@@ -43,9 +59,12 @@ Canonical files:
 
 ## Modify this repo
 
-- Edit the box manifest under `box/<name>/charly.yml` and any embedded `skill:`
-  entity in `charly.yml` together — the skill is the projected usage source, so
-  a change not mirrored in the skill leaves the corpus stale.
+- Edit a skill's body under `.agents/skills/<name>/` at the REPO ROOT and its
+  routing node in the owning candy's `charly.yml` together — never the generated
+  `SKILL.md` in the marketplace corpus; a corpus regeneration
+  (`charly marketplace generate`) projects both. Moving a body back beside a
+  candy re-creates the two-base defect: `charly box validate` and the corpus
+  would then read different trees.
 - Package and behaviour changes go in the matching `distro:` arm and the box's
   `candy:` list; the `@github` refs pin to explicit CalVer tags.
 - New behaviour claims belong in a `plan:` as an observable `check:` step, and
