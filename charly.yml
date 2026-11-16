@@ -38,42 +38,6 @@ discover:
       recursive: true
     - path: candy
       recursive: true
-# Disposable R10 test beds for the arch VMs (kind:check — the 2026-05
-# deploy→check unification moved repo-shipped disposable beds out of
-# deploy.yml). disposable: true is the sole authorization for the
-# unattended destroy+rebuild driven by `charly check run <bed>`. These are
-# zero-side-effect beds (target: vm); there are NO operator deploy entries
-# in this repo, so there is no deploy: section.
-#
-# Relocated from main (2026-06 box inversion) with its vscode-test box: the
-# disposable R10 bed for the Arch vscode direct-download install path. Bare
-# local `box: vscode-test` (the box now lives under box/ in this submodule).
-check-arch-vscode-pod:
-    pod:
-        image: vscode-test
-        disposable: true
-        lifecycle: dev
-        description: Sole proof of the Arch vscode install via the version-pinned, sha256-verified Microsoft direct-download that replaced the broken visual-studio-code-bin AUR package. Builds and deploys the vscode-test pod (arch base + check-keepalive supervisord + vscode), verifies /usr/bin/code and a code --version semver via the baked vscode plan, the supervisord keepalive RUNNING, and that charly status --json shows the running pod (status-shows-pod).
-        plan:
-            - check: command=charly status --json
-              id: status-shows-vscode-pod
-              stdout:
-                - contains: '"kind": "pod"'
-                - contains: check-arch-vscode-pod
-              context:
-                - runtime
-              command:
-                command: charly status --json
-                in_container: false
-# =================================================================
-# check-tmux-pod — R10 witness for terminal:tmux over the generic bidirectional
-# Provider.Channel. The host places the fixed gRPC stdio endpoint inside this disposable
-# pod, launches a typed profile, detaches on the provider's running event, reattaches for a
-# structured snapshot, injects literal text + an allowlisted Enter key, waits for the pane's
-# real zero exit, reads durable transcript evidence, and proves normal completion removed the
-# isolated run-owned tmux server. No recursive command execution, capture-pane polling,
-# fixed sleep, retry, or combination-specific container path participates.
-# =================================================================
 check-tmux-pod:
     pod:
         image: check-tmux-box
