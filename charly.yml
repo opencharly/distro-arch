@@ -2,7 +2,7 @@
 #  opencharly repo (2026-05). Mounted as a git submodule at box/arch.
 #
 #  SINGLE-FILE config: every entity (the arch + arch-builder + cuda-arch-builder
-#  base/builder stack, the arch-coder/charly-arch/arch-test/vscode-test images,
+#  base/builder stack, the arch-coder/charly-arch/arch-test images,
 #  the arch-pacstrap-builder + arch-pacstrap bootstrap pair, the arch +
 #  arch-pacstrap VMs, and the disposable check beds) is inlined here or discovered
 #  under box/. This repo VENDORS NOTHING — every candy layer is an
