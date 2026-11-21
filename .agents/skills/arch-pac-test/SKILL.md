@@ -32,7 +32,7 @@ my-image:
     candy: [arch-pac-test]
 ```
 
-Requires an Arch-based box with `build: [pac]` (or `[pac, aur]`).
+Requires an Arch-based box with `build: [pac]`.
 
 ## Used In Boxes
 

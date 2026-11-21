@@ -6,6 +6,11 @@ arch-builder:
             - npm
             - cargo
             - aur
+            # mise is a build-time manager like the others (opencharly/sdk#608): an arch box that
+            # composes a mise candy routes it here, and the builder box must declare it builds it
+            # (charly box validate: `builder.mise references "arch-builder" which does not declare
+            # builds: [mise]`). The mise stage needs only curl + tar, which this box carries.
+            - mise
         candy:
             - '@github.com/opencharly/layer-pixi:v2026.272.0440'
             - '@github.com/opencharly/layer-nodejs:v2026.272.0322'
