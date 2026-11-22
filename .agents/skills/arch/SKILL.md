@@ -62,7 +62,7 @@ box must route the builder (`builder: aur: arch-builder`, which this base does).
 candy's packages are installed through pacman from the candy's own directory. A box
 that cannot run the aur builder fails the build naming the candy, never ships without
 the package (opencharly/sdk#608). The `/charly-distros:cachyos` base shares this exact
-AUR path (it routes `aur` → `arch.arch-builder` too), so AUR support is identical on
+AUR path (it routes `aur` → `arch-builder` too), so AUR support is identical on
 `arch` and `cachyos`. See `/charly-image:layer` "AUR (`aur:`)" for the authoring
 reference.
 
