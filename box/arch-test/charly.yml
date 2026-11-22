@@ -3,9 +3,9 @@ arch-test:
         base: arch
         build:
             - pac
-            - aur
-        # Explicit builder map: arch-test builds an AUR layer (arch-aur-test); the
-        # aur format routes to the local arch-builder.
+        # Explicit builder map: arch-test composes an AUR candy (arch-aur-test, which
+        # declares its package under distro.arch.aur), so the aur builder routes to the
+        # local arch-builder. aur is a builder, never a box build format.
         builder:
             aur: arch-builder
         candy:
