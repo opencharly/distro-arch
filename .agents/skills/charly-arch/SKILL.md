@@ -41,7 +41,7 @@ can drive build/test/deploy via Streamable HTTP on port 18765.
 ### Rootless-first posture
 
 All four power-user boxes (`charly-arch`, `/charly-distros:charly-fedora`,
-`/charly-coder:fedora-coder`, `/charly-distros:githubrunner`) run rootless because
+`/charly-distros:githubrunner`) run rootless because
 the `/charly-distros:container-nesting` kernel-level RCA proves that
 `unmask=/proc/*` + uid-delegation via subuid/subgid ranges is sufficient for
 rootless nested containers + rootless libvirt VMs.
@@ -199,7 +199,6 @@ packages and scripts per distro.
 
 - `/charly-distros:arch` — parent base image
 - `/charly-distros:charly-fedora` — Fedora counterpart, same candies, same rootless posture
-- `/charly-coder:fedora-coder` — kitchen-sink dev sibling (adds coding CLIs + DevOps)
 - `/charly-distros:githubrunner` — self-hosted GitHub Actions runner; same uid=1000 posture
 
 ## Related Commands
