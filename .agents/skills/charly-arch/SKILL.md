@@ -40,7 +40,7 @@ can drive build/test/deploy via Streamable HTTP on port 18765.
 
 ### Rootless-first posture
 
-All four power-user boxes (`charly-arch`, `/charly-distros:charly-fedora`,
+All three power-user boxes (`charly-arch`, `/charly-distros:charly-fedora`,
 `/charly-distros:githubrunner`) run rootless because
 the `/charly-distros:container-nesting` kernel-level RCA proves that
 `unmask=/proc/*` + uid-delegation via subuid/subgid ranges is sufficient for

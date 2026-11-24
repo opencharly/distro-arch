@@ -107,21 +107,21 @@ No explicit `user:` / `uid:` / `gid:` — inherits the defaults. `user_policy:` 
 
 ## AUR via yay (Arch-specific builder chain)
 
-Unlike fedora-coder (which only uses `pixi`/`npm`/`cargo` builders), `arch-coder` can also pull from the AUR — because the `arch-builder` box ships `yay` and declares `builds: [pixi, npm, cargo, aur]`. Candies with `aur:` sections route through `arch-builder` as their `aur` builder. Currently no candy in the arch-coder stack uses AUR, but the capability exists for future additions (e.g. niche tools not in `[core]`/`[extra]`).
+Unlike the retired fedora-coder (which only used `pixi`/`npm`/`cargo` builders), `arch-coder` can also pull from the AUR — because the `arch-builder` box ships `yay` and declares `builds: [pixi, npm, cargo, aur]`. Candies with `aur:` sections route through `arch-builder` as their `aur` builder. Currently no candy in the arch-coder stack uses AUR, but the capability exists for future additions (e.g. niche tools not in `[core]`/`[extra]`).
 
 See `/charly-distros:arch-builder` and `/charly-tools:yay`.
 
 ## Cross-distro siblings
 
-`arch-coder` is one of the **cross-distro coder boxes** that share the identical `check:` block and a large set of identical candies, diverging only in each candy's package-format section (`rpm:` / `pac:` / `deb:`):
+`arch-coder` was one of the **cross-distro coder boxes** that shared the identical `check:` block and a large set of identical candies, diverging only in each candy's package-format section (`rpm:` / `pac:` / `deb:`):
 
 - `/charly-coder:arch-coder` — this box; pacman + optional AUR, uid=1000 `user`.
 
-All four produce the same developer surface. Pick based on which distro family you (or your team / CI) are already standardized on.
+The Fedora, Debian and Ubuntu coder cards were retired (their boxes are no longer published); `arch-coder` is the remaining one, so there is no longer a distro-family choice to make.
 
 ## The candy stack
 
-Candies in roughly the same groups as fedora-coder, with these Arch-specific notes:
+Candies in roughly the same groups as the other coder boxes, with these Arch-specific notes:
 
 - `nodejs` — Arch's `nodejs` package ships a current Node (v26); no LTS pinning.
 - `language-runtimes` — Arch ships `dotnet-sdk` in `[extra]` (no Microsoft repo needed, unlike Debian/Ubuntu). Also drops `python3-ramalama` (not packaged on Arch — install via `uv tool install ramalama`).
