@@ -12,8 +12,8 @@ arch-builder:
             # builds: [mise]`). The mise stage needs only curl + tar, which this box carries.
             - mise
         candy:
-            - '@github.com/opencharly/layer-pixi:v2026.272.0440'
-            - '@github.com/opencharly/layer-nodejs:v2026.272.0322'
-            - '@github.com/opencharly/layer-build-toolchain:v2026.271.1840'
-            - '@github.com/opencharly/layer-yay:v2026.272.0425'
+            - '@github.com/opencharly/layer-pixi:v2026.314.0709'
+            - '@github.com/opencharly/layer-nodejs:v2026.314.0707'
+            - '@github.com/opencharly/layer-build-toolchain:v2026.314.0704'
+            - '@github.com/opencharly/layer-yay:v2026.314.0711'
             - arch-skills
