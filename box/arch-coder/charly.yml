@@ -29,7 +29,7 @@ arch-coder:
             # so the closure is byte-identical and no pin needs advancing.
             - '@github.com/opencharly/layer-agent-forwarding:v2026.314.0704'
             - '@github.com/opencharly/pod-sshd:v2026.328.0748'
-            - '@github.com/opencharly/pod-charly-mcp:v2026.328.0725'
+            - '@github.com/opencharly/pod-charly-mcp:v2026.330.1726'
             - '@github.com/opencharly/layer-container-nesting:v2026.321.0754'
             - '@github.com/opencharly/pod-dbus:v2026.314.0717'
             - '@github.com/opencharly/layer-tmux:v2026.314.0710'

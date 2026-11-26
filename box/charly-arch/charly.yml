@@ -5,7 +5,7 @@ charly-arch:
             # ONE SOURCE per layer (opencharly/charly#739, operator ruling): `pod-charly-mcp`
             # provides `layer-charly`, so it is not re-listed here.
             - '@github.com/opencharly/layer-agent-forwarding:v2026.314.0704'
-            - '@github.com/opencharly/pod-charly-mcp:v2026.328.0725'
+            - '@github.com/opencharly/pod-charly-mcp:v2026.330.1726'
             - '@github.com/opencharly/layer-golang:v2026.314.0706'
             - '@github.com/opencharly/layer-gh:v2026.328.0725'
             - '@github.com/opencharly/pod-sshd:v2026.328.0748'
