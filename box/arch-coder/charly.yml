@@ -35,7 +35,7 @@ arch-coder:
             - '@github.com/opencharly/layer-tmux:v2026.314.0710'
             - '@github.com/opencharly/layer-language-runtimes:v2026.328.0738'
             - '@github.com/opencharly/layer-golang:v2026.314.0706'
-            - '@github.com/opencharly/layer-pixi:v2026.314.0709'
+            - '@github.com/opencharly/layer-pixi:v2026.330.1550'
             - '@github.com/opencharly/layer-uv:v2026.328.0726'
             - '@github.com/opencharly/layer-build-toolchain:v2026.314.0704'
             - '@github.com/opencharly/layer-dev-tools:v2026.328.0734'
