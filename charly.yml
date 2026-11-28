@@ -52,7 +52,7 @@ check-tmux-pod:
               # The typed-terminal round-trip drives a detached pod through the agent channel
               # and captures ordered evidence; on a cold host it exceeds the ~2m never-hang
               # ceiling, and a probe killed at the ceiling reports NO exit status (measured
-              # 1m59.852s, opencharly/distro-arch#84). The bed already declares a generous
+              # 1m59.852s, opencharly/distro-arch#75). The bed already declares a generous
               # timeout for its other long host-orchestration step (900s), so this one states
               # its own instead of inheriting the ceiling.
               timeout: 900s
